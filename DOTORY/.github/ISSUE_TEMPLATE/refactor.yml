@@ -1,0 +1,25 @@
+name: ♻️ Refactor
+description: 코드 리팩토링 작업
+title: "[Refactor] "
+labels: ["refactor ♻️"]
+body:
+  - type: textarea
+    id: target
+    attributes:
+      label: 🗂️ 대상
+      description: 리팩토링할 부분을 적어주세요.
+      placeholder: ex) UserService 로직 단순화
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: 📌 이유
+      description: 왜 리팩토링이 필요한가요?
+      placeholder: ex) 코드 중복이 많고 테스트하기 어려움
+  - type: textarea
+    id: plan
+    attributes:
+      label: 🛠️ 개선 방향
+      description: 리팩토링 방법을 적어주세요.
+      placeholder: ex) 중복 메서드 분리, 의존성 주입 개선

@@ -1,0 +1,25 @@
+name: ✨ Feature Request
+description: 새로운 기능 개발 이슈
+title: "[Feature] "
+labels: ["feature ✨"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📝 요약
+      description: 어떤 기능을 추가하려고 하나요?
+      placeholder: ex) 회원가입 시 이메일 인증 기능 추가
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 📌 상세 내용
+      description: 필요한 기능 요구사항을 구체적으로 작성해주세요.
+      placeholder: ex) 인증 메일 발송, 인증 토큰 만료 시간 10분
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: ✅ 완료 조건
+      description: 이슈가 완료되었다고 판단할 기준은?
+      placeholder: ex) 인증 메일이 발송되고, 인증 성공 시 회원가입 완료 처리

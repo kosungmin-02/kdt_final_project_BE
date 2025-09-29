@@ -1,0 +1,28 @@
+name: 🐛 Bug Report
+description: 버그 리포트
+title: "[Fix] "
+labels: ["bug 🐛"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📝 버그 설명
+      description: 어떤 문제가 발생했나요?
+      placeholder: ex) 로그인 시 500 에러 발생
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 🔄 재현 방법
+      description: 버그가 어떻게 발생하는지 단계별로 적어주세요.
+      placeholder: |
+        1. 로그인 페이지 이동
+        2. 잘못된 비밀번호 입력
+        3. 500 에러 발생
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ 기대 동작
+      description: 원래 기대했던 동작은 무엇인가요?
+      placeholder: ex) "비밀번호가 올바르지 않습니다" 메시지 출력

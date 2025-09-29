@@ -1,0 +1,43 @@
+`name: 🚀 Deploy
+description: 배포 관련 이슈
+title: "[Deploy] "
+labels: ["deploy 🚀"]
+body:
+  - type: input
+    id: branch
+    attributes:
+      label: 🌿 대상 브랜치
+      placeholder: ex) main, develop
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: 🏷️ 배포 환경
+      placeholder: ex) dev, prod
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 📌 배포 버전 (선택)
+      placeholder: ex) v1.0.0
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: 📝 변경 사항 요약
+      placeholder: ex) 회원가입 기능 추가 (#12), 로그인 에러 수정 (#34)
+    validations:
+      required: true
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: ✅ 체크리스트
+      placeholder: |
+        - [ ] CI/CD 통과 확인
+        - [ ] 환경 변수 최신화
+        - [ ] 롤백 방법 확인
