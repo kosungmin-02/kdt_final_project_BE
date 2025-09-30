@@ -42,11 +42,7 @@ dependencies {
 	implementation 'com.auth0:java-jwt:4.5.0'
 	// OAuth
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-	// AWS S3 SDK
-	implementation 'software.amazon.awssdk:s3'
-	implementation platform('software.amazon.awssdk:bom:2.20.27')
-	// Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// gptAPI
 
 }

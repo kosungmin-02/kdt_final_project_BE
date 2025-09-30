@@ -47,8 +47,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
-    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S35001", "파일 업로드 중 오류가 발생했습니다."),
-    S3_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "S35002", "파일 삭제 중 오류가 발생했습니다."),
+
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB5003", "데이터베이스 처리 중 오류가 발생했습니다."),
     AI_ANALYSIS_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AI5004", "AI 분석 중 오류가 발생했습니다."),
     FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE5005", "파일 읽기에 실패했습니다."),

@@ -36,3 +36,7 @@ out/
 ### VS Code ###
 .vscode/
 *-local.yml
+
+### Secrets ###
+# Firebase admin SDK key
+dotory-7c1fe-firebase-adminsdk-fbsvc-3aa390a50b.json
