@@ -44,7 +44,7 @@ public class EmailSendService {
     public void sendEmailWelcome(UserDTO userDTO) {
         log.info("EmailSendService - sendEmailWelcome()");
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(userDTO.getUserEmail());
+        simpleMailMessage.setTo(userDTO.userEmail());
         simpleMailMessage.setSubject("[도토리] 가입을 환영합니다.");
         simpleMailMessage.setText("도토리에 가입하신 것을 환영합니다! 앞으로 많은 소통을 해보아요!");
         simpleMailMessage.setFrom("setilvereun@gmail.com");

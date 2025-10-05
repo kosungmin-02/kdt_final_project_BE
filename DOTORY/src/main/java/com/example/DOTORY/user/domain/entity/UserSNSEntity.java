@@ -16,7 +16,7 @@ public class UserSNSEntity extends BaseEntity {   // ← BaseEntity 상속
     @Column(name = "SOCIALPK")
     private Long socialPK;
 
-    // USER 테이블과 1:N 관계
+    // 한 명의 사용자는 여러 SNS 로그인(여기선 2개) 가질 수 있다.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USERPK", nullable = false)
     private UserEntity user;

@@ -4,6 +4,7 @@ import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.user.api.dto.UserDTO;
 import com.example.DOTORY.user.application.LoginService;
 import com.example.DOTORY.user.application.SNSLoginService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Tag(name = "로그인 API", description = "일반 로그인과 SNS 로그인 (카카오 / 네이버)")
 @RestController
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @Slf4j

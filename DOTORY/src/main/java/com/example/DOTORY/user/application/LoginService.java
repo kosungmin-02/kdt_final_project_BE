@@ -25,8 +25,8 @@ public class LoginService {
     public String loginConfirm(UserDTO userDTO){
         log.info("LoginService - loginConfirm");
 
-        return userRepository.findByUserID(userDTO.getUserID())
-                .filter(u -> passwordEncoder.matches(userDTO.getUserPassword(), u.getUserPassword()))
+        return userRepository.findByUserID(userDTO.userID())
+                .filter(u -> passwordEncoder.matches(userDTO.userPassword(), u.getUserPassword()))
                 .map(u -> {
                     u.setUserLogin(UserLogin.LOGIN);
                     userRepository.save(u);

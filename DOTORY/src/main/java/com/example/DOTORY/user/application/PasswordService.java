@@ -32,7 +32,7 @@ public class PasswordService {
         log.info("findpassword()");
 
         Optional<UserEntity> optionalUser =
-                userRepository.findByUserIDAndUserEmail(userDTO.getUserID(), userDTO.getUserEmail());
+                userRepository.findByUserIDAndUserEmail(userDTO.userID(), userDTO.userEmail());
 
         if(optionalUser.isPresent()) {
             // 임시 비밀번호 발급
@@ -45,7 +45,7 @@ public class PasswordService {
             if (updateUser != null)
             {
                 // 이메일 보내기
-                emailSendService.sendTempPasswordByEmail(userDTO.getUserEmail(), tempPassword);
+                emailSendService.sendTempPasswordByEmail(userDTO.userEmail(), tempPassword);
             }
             return USER_SENDPASSWORD_SUCCESS;
         }

@@ -3,12 +3,14 @@ package com.example.DOTORY.user.api.controller;
 
 import com.example.DOTORY.user.api.dto.AgreeDTO;
 import com.example.DOTORY.user.application.AgreeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Agree API", description = "약관 관련 API (필수약관/선택약관)")
 @RestController
 @RequestMapping("/api/users")
 @Slf4j

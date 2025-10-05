@@ -110,7 +110,7 @@ public class UserController {
             @RequestBody UserDTO userDTO,
             @RequestHeader("Authorization") String authHeader) {
 
-        log.info("UserController - changeProfile(), userID = {}", userDTO.getUserID());
+        log.info("UserController - changeProfile(), userID = {}", userDTO.userID());
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(401).body(ApiResponse.onFailure("UNAUTHORIZED", "권한 없음", null));
@@ -119,7 +119,7 @@ public class UserController {
         String token = authHeader.substring(7);
         String userID = jwtProvider.getUserIdFromToken(token);
 
-        if (!userID.equals(userDTO.getUserID())) {
+        if (!userID.equals(userDTO.userID())) {
             return ResponseEntity.status(401).body(ApiResponse.onFailure("UNAUTHORIZED", "권한 없음", null));
         }
 
