@@ -1,4 +1,4 @@
-package com.example.DOTORY.user.jwt;
+package com.example.DOTORY.global.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

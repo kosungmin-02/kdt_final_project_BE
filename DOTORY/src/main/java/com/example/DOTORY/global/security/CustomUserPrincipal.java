@@ -1,4 +1,4 @@
-package com.example.DOTORY.user.security;
+package com.example.DOTORY.global.security;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import com.example.DOTORY.user.domain.entity.UserStatus;
 import lombok.Getter;
@@ -17,6 +17,13 @@ public class CustomUserPrincipal implements OAuth2User, UserDetails {
     private final UserEntity user;
     private final Map<String, Object> attributes;
 
+    // JWT 전용 생성자
+    public CustomUserPrincipal(UserEntity user) {
+        this.user = user;
+        this.attributes = Collections.emptyMap(); // OAuth2 attributes는 비워둠
+    }
+
+    // OAuth2용 생성자
     public CustomUserPrincipal(UserEntity user, Map<String, Object> attributes) {
         this.user = user;
         this.attributes = attributes;

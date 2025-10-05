@@ -1,7 +1,8 @@
-package com.example.DOTORY.user.security;
+package com.example.DOTORY.global.security;
 
 import com.example.DOTORY.user.application.CustomOAuth2UserService;
-import com.example.DOTORY.user.jwt.JwtProvider;
+import com.example.DOTORY.global.jwt.JwtProvider;
+import com.example.DOTORY.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,7 @@ public class UserSecurityConfig {
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     @Bean
     // 시큐리티 default 기능들 잠시 꺼놓기 설정
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    SecurityFilterChain filterChain(HttpSecurity http, UserRepository userRepository) throws Exception{
 
         // CSRF와 CORS 비활성화. (SPA + API)이기 때문.
         http
@@ -31,7 +32,7 @@ public class UserSecurityConfig {
 
                 // REST API + React SPA 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/**", "/oauth2/**").permitAll() // 로그인/회원가입 API 허용
+                        .requestMatchers("/api/users/**", "/oauth2/**", "/api/posts/*/comments").permitAll() // 로그인/회원가입 API 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
 
@@ -44,7 +45,7 @@ public class UserSecurityConfig {
                 );
 
         // JWT filter
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, userRepository),
                 UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

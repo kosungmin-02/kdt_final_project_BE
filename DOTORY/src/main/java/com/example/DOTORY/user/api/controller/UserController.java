@@ -5,7 +5,7 @@ import com.example.DOTORY.user.api.dto.UserDTO;
 import com.example.DOTORY.user.application.EmailSendService;
 import com.example.DOTORY.user.application.PasswordService;
 import com.example.DOTORY.user.application.UserService;
-import com.example.DOTORY.user.jwt.JwtProvider;
+import com.example.DOTORY.global.jwt.JwtProvider;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;

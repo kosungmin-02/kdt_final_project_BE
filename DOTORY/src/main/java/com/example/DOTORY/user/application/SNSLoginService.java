@@ -3,11 +3,12 @@ package com.example.DOTORY.user.application;
 import com.example.DOTORY.user.domain.entity.*;
 import com.example.DOTORY.user.domain.repository.UserRepository;
 import com.example.DOTORY.user.domain.repository.UserSNSRepository;
-import com.example.DOTORY.user.jwt.JwtProvider;
+import com.example.DOTORY.global.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -90,11 +91,13 @@ public class SNSLoginService {
         return user;
     }
 
+    @Transactional
     public String loginWithKakaoAndReturnJwt(String providerID, String email, String userName) {
         UserEntity user = loginWithKakao(providerID, email, userName);
         return jwtProvider.generateToken(user.getUserID());
     }
 
+    @Transactional
     public String loginWithNaverAndReturnJwt(String providerID, String email, String userName) {
         UserEntity user = loginWithNaver(providerID, email, userName);
         return jwtProvider.generateToken(user.getUserID());

@@ -1,4 +1,4 @@
-package com.example.DOTORY.user.config;
+package com.example.DOTORY.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,7 +1,7 @@
 package com.example.DOTORY.user.application;
 
 import com.example.DOTORY.user.domain.entity.UserEntity;
-import com.example.DOTORY.user.security.CustomUserPrincipal;
+import com.example.DOTORY.global.security.CustomUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

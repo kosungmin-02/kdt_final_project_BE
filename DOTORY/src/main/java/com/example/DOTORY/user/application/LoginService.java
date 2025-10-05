@@ -3,7 +3,7 @@ package com.example.DOTORY.user.application;
 import com.example.DOTORY.user.api.dto.UserDTO;
 import com.example.DOTORY.user.domain.entity.UserLogin;
 import com.example.DOTORY.user.domain.repository.UserRepository;
-import com.example.DOTORY.user.jwt.JwtProvider;
+import com.example.DOTORY.global.jwt.JwtProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

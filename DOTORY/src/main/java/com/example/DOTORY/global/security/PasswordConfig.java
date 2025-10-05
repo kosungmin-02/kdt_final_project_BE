@@ -1,4 +1,4 @@
-package com.example.DOTORY.user.security;
+package com.example.DOTORY.global.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
