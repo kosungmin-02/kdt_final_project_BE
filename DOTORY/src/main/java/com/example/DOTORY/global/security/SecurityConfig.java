@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @Configuration      // UserSecurityConfig가 의존성 설정이 되도록 어노테이션 부착.
 @EnableWebSecurity  // Security를 지금 사용하는 웹에 적용하겠다는 의미로 어노테이션 부착.
-public class UserSecurityConfig {
+public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtProvider jwtProvider;
@@ -26,7 +26,7 @@ public class UserSecurityConfig {
 
         // CSRF와 CORS 비활성화. (SPA + API)이기 때문.
         http
-                .cors(cors -> cors.disable())
+                .cors(cors->cors.disable())
                 .csrf(csrf -> csrf.disable());
         http
                 .formLogin(login -> login.disable())
@@ -44,7 +44,10 @@ public class UserSecurityConfig {
                         .requestMatchers("/api/users/**",
                                 "/oauth2/**",
                                 "/api/posts/*/comments",
+                                // 테스트를 위해서 관리자 페이지를 모두 허용으로 해놓았음.
+                                "/api/admin/users/**",
                                 "/api/posts/*/likes/count").permitAll() // 로그인/회원가입 API 허용
+
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
 

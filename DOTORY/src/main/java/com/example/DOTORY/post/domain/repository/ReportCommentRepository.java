@@ -1,6 +1,7 @@
 package com.example.DOTORY.post.domain.repository;
 
 import com.example.DOTORY.post.domain.entity.ReportComment;
+import com.example.DOTORY.user.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
@@ -13,4 +14,6 @@ public interface ReportCommentRepository extends JpaRepository<ReportComment, Lo
 
     // 댓글 신고 내역 조회
     List<ReportComment> findByUser_UserPK(int userPK);
+
+    ReportComment[] findByReportedUser(UserEntity user);
 }
