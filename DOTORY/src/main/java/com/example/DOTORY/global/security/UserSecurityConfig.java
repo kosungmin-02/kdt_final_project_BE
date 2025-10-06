@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @Configuration      // UserSecurityConfig가 의존성 설정이 되도록 어노테이션 부착.
 @EnableWebSecurity  // Security를 지금 사용하는 웹에 적용하겠다는 의미로 어노테이션 부착.
-public class SecurityConfig {
+public class UserSecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtProvider jwtProvider;
