@@ -45,7 +45,7 @@ public class UserSecurityConfig {
                                 "/oauth2/**",
                                 "/api/posts/*/comments",
                                 // 테스트를 위해서 관리자 페이지를 모두 허용으로 해놓았음.
-                                "/api/admin/users/**",
+                                "/api/admin/**",
                                 "/api/posts/*/likes/count").permitAll() // 로그인/회원가입 API 허용
 
                         .anyRequest().authenticated() // 나머지는 인증 필요
