@@ -34,8 +34,10 @@ public class ReportComment {
     private Comment comment;  // Reply 엔티티를 FK로 연결
 
     // 신고 카테고리 (총 6개)
-    @Enumerated(EnumType.STRING)
-    private ReportReason reason;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private ReportCategory category;  // DB에서 관리되는 신고 카테고리
+
 
     // 신고 상세 이유
     private String reportContent;

@@ -68,5 +68,20 @@ public class AdminAgreeService {
                 .collect(Collectors.toList());
     }
 
+    // 약관 삭제
+    @Transactional
+    public void deleteAgree(int agreeId) {
+        AgreeEntity agree = agreeRepository.findById(agreeId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 약관입니다."));
+
+        // 연관관계때문에 해당 선택약관 동의했던 사람들도 삭제하려면 아래처럼 자식 -> 부모 순서로 삭제.
+        // 자식 먼저 삭제
+        userAgreeRepository.deleteAllByAgree_AgreeID(agreeId);
+        userAgreeRepository.flush();
+
+        // 부모 삭제
+        agreeRepository.delete(agree);
+        agreeRepository.flush();
+    }
 
 }
