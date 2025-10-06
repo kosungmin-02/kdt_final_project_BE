@@ -2,10 +2,13 @@ package com.example.DOTORY.user.api.controller;
 
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.user.api.dto.UserDTO;
+import com.example.DOTORY.user.application.AgreeService;
 import com.example.DOTORY.user.application.EmailSendService;
 import com.example.DOTORY.user.application.PasswordService;
 import com.example.DOTORY.user.application.UserService;
 import com.example.DOTORY.global.jwt.JwtProvider;
+import com.example.DOTORY.user.domain.entity.UserEntity;
+import com.example.DOTORY.user.domain.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,8 @@ public class UserController {
     private final EmailSendService emailSendService;
     private final PasswordService passwordService;
     private final JwtProvider jwtProvider;
+    private final UserRepository userRepository;
+    private final AgreeService agreeService;
 
     // 회원가입
     @PostMapping("/registerConfirm")
@@ -32,10 +37,18 @@ public class UserController {
         int result = userService.registerConfirm(userDTO);
 
         if(result == 1){
+            // 가입한 UserEntity 조회
+            UserEntity savedUser = userRepository.findByUserID(userDTO.userID()).get();
+
+            // 사용자가 동의한 약관 저장
+            agreeService.saveUserAgreements(savedUser, userDTO.agree());
             return ResponseEntity.ok(ApiResponse.onSuccess(null));
         } else {
             return ResponseEntity.badRequest().body(ApiResponse.onFailure("REGISTER_FAIL", "회원가입 실패", null));
         }
+
+
+
     }
 
     // 이메일 인증 코드 전송

@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReportPost {
+public class ReportComment {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reportId;
 
     // 신고자
@@ -22,17 +23,17 @@ public class ReportPost {
     @JoinColumn(name = "userPK")
     private UserEntity user;
 
-    // 피신고자 (게시글 작성자)
+    // 피신고자 (댓글 작성자)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_userPK")
     private UserEntity reportedUser;
 
-    // 신고 대상 게시글
+    // 신고 대상 댓글
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "reply_id")
+    private Comment comment;  // Reply 엔티티를 FK로 연결
 
-    // 신고 카테고리 ( 총 6개 )
+    // 신고 카테고리 (총 6개)
     @Enumerated(EnumType.STRING)
     private ReportReason reason;
 
@@ -49,7 +50,7 @@ public class ReportPost {
     // 신고 처리 완료 날짜
     private LocalDateTime confirmDate;
 
-    // 처리 완료(COMPLETE)되면 바로 처리 완료 날짜에 날짜 자동으로 저장하기.
+    // 처리 완료(COMPLETE)되면 confirmDate 자동 저장
     public void setReportConfirm(ReportConfirm reportConfirm) {
         this.reportConfirm = reportConfirm;
         if (reportConfirm == ReportConfirm.COMPLETE) {
@@ -57,4 +58,3 @@ public class ReportPost {
         }
     }
 }
-

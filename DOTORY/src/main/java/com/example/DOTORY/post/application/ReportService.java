@@ -1,16 +1,22 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.post.api.dto.request.ReportCommentRequest;
 import com.example.DOTORY.post.api.dto.request.ReportRequest;
 import com.example.DOTORY.post.api.dto.response.SimpleResponse;
-import com.example.DOTORY.post.domain.entity.Post;
-import com.example.DOTORY.post.domain.entity.ReportPost;
+import com.example.DOTORY.post.domain.entity.*;
+import com.example.DOTORY.post.domain.repository.CommentRepository;
 import com.example.DOTORY.post.domain.repository.PostRepository;
+import com.example.DOTORY.post.domain.repository.ReportCommentRepository;
 import com.example.DOTORY.post.domain.repository.ReportRepository;
+import com.example.DOTORY.user.application.UserService;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import com.example.DOTORY.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +25,8 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-
+    private final CommentRepository commentRepository;
+    private final ReportCommentRepository reportCommentRepository;
 
     @Transactional
     public SimpleResponse reportPost(ReportRequest request) {
@@ -52,6 +59,7 @@ public class ReportService {
                 .reason(request.getReason())
                 .reportContent(request.getReportContent())
                 .reportDate(request.getReportDate())
+                .reportConfirm(ReportConfirm.WAITING)       // 기본값으로 WAITING 넣음.
                 .build();
 
         ReportPost saved = reportRepository.save(report);
@@ -64,8 +72,91 @@ public class ReportService {
                 .reason(saved.getReason())
                 .reportContent(saved.getReportContent())
                 .reportDate(saved.getReportDate())
+                .reportConfirm(saved.getReportConfirm())
                 .build();
     }
 
 
+    // 댓글 신고
+    @Transactional
+    public SimpleResponse reportComment(ReportCommentRequest request) {
+        Comment comment = commentRepository.findById(request.getCommentId())
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+
+        UserEntity reporter = userRepository.findById(request.getReporterUserPK())
+                .orElseThrow(() -> new IllegalArgumentException("신고자를 찾을 수 없습니다."));
+
+        UserEntity reported = comment.getUser();
+
+        if (reporter.getUserPK() == reported.getUserPK()) {
+            throw new IllegalArgumentException("본인 댓글은 신고할 수 없습니다.");
+        }
+
+        if (reportCommentRepository.existsByComment_CommentIdAndUser_UserPK(
+                request.getCommentId(), reporter.getUserPK()
+        )) {
+            throw new IllegalArgumentException("이미 신고한 댓글입니다.");
+        }
+
+        ReportComment report = ReportComment.builder()
+                .user(reporter)
+                .reportedUser(reported)
+                .comment(comment)
+                .reason(request.getReason())
+                .reportContent(request.getReportContent())
+                .reportDate(request.getReportDate())
+                .reportConfirm(ReportConfirm.WAITING)
+                .build();
+
+        ReportComment saved = reportCommentRepository.save(report);
+
+        return SimpleResponse.builder()
+                .reportId(saved.getReportId())
+                .commentId(saved.getComment().getCommentId())
+                .userPK(saved.getUser().getUserPK())
+                .reportedUserPK(saved.getReportedUser().getUserPK())
+                .reason(saved.getReason())
+                .reportContent(saved.getReportContent())
+                .reportDate(saved.getReportDate())
+                .reportConfirm(saved.getReportConfirm())
+                .build();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<SimpleResponse> getUserReportHistory(int userPK) {
+        // 1. 게시글 신고 내역
+        List<SimpleResponse> postReports = reportRepository.findByUser_UserPK(userPK).stream()
+                .map(report -> SimpleResponse.builder()
+                        .reportId(report.getReportId())
+                        .postId(report.getPost().getPostId())
+                        .userPK(report.getUser().getUserPK())
+                        .reportedUserPK(report.getReportedUser().getUserPK())
+                        .reason(report.getReason())
+                        .reportContent(report.getReportContent())
+                        .reportDate(report.getReportDate())
+                        .reportConfirm(report.getReportConfirm())
+                        .message("게시글 신고 내역")
+                        .build())
+                .collect(Collectors.toList());
+
+        // 2. 댓글 신고 내역
+        List<SimpleResponse> commentReports = reportCommentRepository.findByUser_UserPK(userPK).stream()
+                .map(report -> SimpleResponse.builder()
+                        .reportId(report.getReportId())
+                        .commentId(report.getComment().getCommentId())
+                        .userPK(report.getUser().getUserPK())
+                        .reportedUserPK(report.getReportedUser().getUserPK())
+                        .reason(report.getReason())
+                        .reportContent(report.getReportContent())
+                        .reportDate(report.getReportDate())
+                        .reportConfirm(report.getReportConfirm())
+                        .message("댓글 신고 내역")
+                        .build())
+                .collect(Collectors.toList());
+
+        // 3. 게시글 신고 + 댓글 신고 합치기
+        postReports.addAll(commentReports);
+        return postReports;
+    }
 }

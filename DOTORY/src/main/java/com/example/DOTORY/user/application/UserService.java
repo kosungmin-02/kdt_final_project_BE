@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
@@ -41,7 +42,6 @@ public class UserService {
 
         // UserDTO를 UserEntity로 변환
         UserEntity userEntity = UserEntity.builder()
-                .userPK(userDTO.userPK())
                 .userID(userDTO.userID())
                 .userPassword(encodedPassword) // 암호화된 비밀번호 저장
                 .userEmail(userDTO.userEmail())
@@ -75,7 +75,8 @@ public class UserService {
                     userEntity.getUserEmail(),
                     userEntity.getUserRole(),
                     userEntity.getCreatedDate().toString(),
-                    userEntity.getUpdatedDate().toString()
+                    userEntity.getUpdatedDate().toString(),
+                    new ArrayList<>()
             );
         }
         return null;
