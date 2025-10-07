@@ -15,5 +15,7 @@ public interface ReportRepository extends JpaRepository<ReportPost, Long> {
     // 사용자 PK로 신고 내역 조회
     List<ReportPost> findByUser_UserPK(int userPK);
 
-    ReportPost[] findByReportedUser(UserEntity user);
+    // ReportPost[] findByReportedUser(UserEntity user);
+    List<ReportPost> findByReportedUser(UserEntity user);
+    Collection<Object> findByReportedUser_UserPK(int userPK);
 }

@@ -33,6 +33,9 @@ public class ReportComment {
     @JoinColumn(name = "reply_id")
     private Comment comment;  // Reply 엔티티를 FK로 연결
 
+    // 처리 내용
+    private String confirmMessage;
+
     // 신고 카테고리 (총 6개)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

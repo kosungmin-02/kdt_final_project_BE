@@ -43,6 +43,9 @@ public class ReportPost {
     // 신고 날짜
     private LocalDateTime reportDate;
 
+    // 처리 내용
+    private String confirmMessage;
+
     // 신고 처리 여부
     @Enumerated(EnumType.STRING)
     private ReportConfirm reportConfirm = ReportConfirm.WAITING;
