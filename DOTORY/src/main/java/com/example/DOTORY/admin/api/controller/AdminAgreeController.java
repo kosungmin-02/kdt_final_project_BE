@@ -1,5 +1,6 @@
 package com.example.DOTORY.admin.api.controller;
 
+import com.example.DOTORY.admin.api.dto.DeleteAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UpdateAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UserInfoDTO;
 import com.example.DOTORY.user.api.dto.AgreeDTO;
@@ -51,4 +52,17 @@ public class AdminAgreeController {
     ) {
         return adminAgreeService.getUsersAgreedForOptional(agreeId);
     }
+
+    // 관리자 약관 삭제
+    @Operation(summary="약관 삭제", description = "관리자가 약관 삭제하고 싶으면 삭제하고, 만약 선택약관이라면 선택동의했던 회원 정보도 삭제")
+    @DeleteMapping("/{agreeId}")
+    public DeleteAgreeDTO deleteAgree(@PathVariable int agreeId) {
+        try {
+            adminAgreeService.deleteAgree(agreeId);
+            return new DeleteAgreeDTO(true, "약관 삭제 성공");
+        } catch (RuntimeException e) {
+            return new DeleteAgreeDTO(false, e.getMessage());
+        }
+    }
+
 }

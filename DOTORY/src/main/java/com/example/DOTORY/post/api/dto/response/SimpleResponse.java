@@ -2,7 +2,7 @@
 package com.example.DOTORY.post.api.dto.response;
 
 import com.example.DOTORY.post.domain.entity.ReportConfirm;
-import com.example.DOTORY.post.domain.entity.ReportReason;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,7 +20,9 @@ public class SimpleResponse {
     private Long commentId;   // 댓글 신고일 경우 사용
     private int userPK;       // 신고한 사람
     private int reportedUserPK;  // 신고 당한 사람
-    private ReportReason reason;
+
+    @JsonProperty("categoryName")
+    private String categoryName; // report reason(enum) -> report category로 변경.
     private String reportContent;
     private LocalDateTime reportDate;
     private ReportConfirm reportConfirm;
