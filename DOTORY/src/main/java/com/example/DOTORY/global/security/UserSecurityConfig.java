@@ -41,6 +41,13 @@ public class UserSecurityConfig {
 
                 // REST API + React SPA 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        // swagger 허용
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
                         .requestMatchers("/api/users/**",
                                 "/oauth2/**",
                                 "/api/posts/*/comments",

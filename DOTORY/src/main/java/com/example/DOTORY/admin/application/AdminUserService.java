@@ -3,10 +3,7 @@ package com.example.DOTORY.admin.application;
 import com.example.DOTORY.admin.api.dto.AdminCheckUserDTO;
 import com.example.DOTORY.admin.api.dto.AdminCheckUserReportDTO;
 import com.example.DOTORY.admin.api.dto.UserAgreeInfoDTO;
-import com.example.DOTORY.post.domain.entity.ReportComment;
-import com.example.DOTORY.post.domain.entity.ReportConfirm;
-import com.example.DOTORY.post.domain.entity.ReportPost;
-import com.example.DOTORY.post.domain.entity.ReportReason;
+import com.example.DOTORY.post.domain.entity.*;
 import com.example.DOTORY.post.domain.repository.ReportCommentRepository;
 import com.example.DOTORY.post.domain.repository.ReportRepository;
 import com.example.DOTORY.user.domain.entity.UserAgreeEntity;
@@ -61,7 +58,7 @@ public class AdminUserService {
                     rp.getReportId(),
                     "게시물",
                     rp.getPost().getPostId(),
-                    rp.getReason(),         // ReportReason Enum
+                    rp.getCategory(),         // ReportReason Enum
                     rp.getReportContent(),
                     rp.getReportDate(),
                     rp.getReportConfirm(),  // ReportConfirm Enum
@@ -75,7 +72,7 @@ public class AdminUserService {
                     rc.getReportId(),
                     "댓글",
                     rc.getComment().getCommentId(),
-                    rc.getReason(),        // ReportReason enum
+                    rc.getCategory(),        // ReportReason enum
                     rc.getReportContent(),
                     rc.getReportDate(),
                     rc.getReportConfirm(), // ReportConfirm enum
@@ -100,18 +97,24 @@ public class AdminUserService {
     }
 
     // [공통] - 신고 DTO 생성
-    private AdminCheckUserReportDTO buildReportDTO(Long reportId, String type, Long targetId,
-                                                   ReportReason reasonEnum, String reportContent,
-                                                   java.time.LocalDateTime reportDate,
-                                                   ReportConfirm confirmEnum, java.time.LocalDateTime confirmDate) {
+    private AdminCheckUserReportDTO buildReportDTO(
+            Long reportId,
+            String type,
+            Long targetId,
+            ReportCategory category,   // enum -> entity
+            String reportContent,
+            java.time.LocalDateTime reportDate,
+            ReportConfirm confirmEnum,
+            java.time.LocalDateTime confirmDate
+    ) {
         String confirmReason = confirmEnum == ReportConfirm.COMPLETE ? "경고 사유 표시" : null;
 
         return new AdminCheckUserReportDTO(
                 reportId,
                 type,
                 targetId,
-                reasonEnum.name(),
-                reasonEnum.getDescription(),
+                category != null ? category.getReason() : null,       // 영어 코드 → reason
+                category != null ? category.getCategoryName() : null, // 한글 설명 -> categoryName
                 reportContent,
                 reportDate,
                 confirmEnum != null ? confirmEnum.name() : null,
@@ -120,6 +123,7 @@ public class AdminUserService {
                 confirmReason
         );
     }
+
 
 
     // 전체 회원 조회하기

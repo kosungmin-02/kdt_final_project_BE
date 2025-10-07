@@ -3,6 +3,7 @@ package com.example.DOTORY.user.domain.repository;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 // 엔티티 매니저가 관리할 엔티티는 UserEntity 이며, 기본키는 userPK로 데이터타입이 int였습니다.
@@ -18,4 +19,6 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     public Optional<UserEntity> findByUserIDAndUserEmail(String userID, String userEmail);
 
     Optional<UserEntity> findByUserEmail(String email);
+
+    List<UserEntity> findByUserIDContainingIgnoreCase(String keyword);
 }

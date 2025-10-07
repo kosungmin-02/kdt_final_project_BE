@@ -32,15 +32,19 @@ public class ReportPost {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    // 신고 카테고리 ( 총 6개 )
-    @Enumerated(EnumType.STRING)
-    private ReportReason reason;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private ReportCategory category;  // DB에서 관리되는 신고 카테고리
+
 
     // 신고 상세 이유
     private String reportContent;
 
     // 신고 날짜
     private LocalDateTime reportDate;
+
+    // 처리 내용
+    private String confirmMessage;
 
     // 신고 처리 여부
     @Enumerated(EnumType.STRING)
