@@ -11,4 +11,6 @@ public interface UserAgreeRepository  extends JpaRepository<UserAgreeEntity, Int
 
         // 특정 약관에 동의한 회원만 조회
         List<UserAgreeEntity> findByAgree_AgreeIDAndAgreedTrue(int agreeId);
+
+    void deleteAllByAgree_AgreeID(int agreeId);
 }

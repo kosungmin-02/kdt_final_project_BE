@@ -15,5 +15,6 @@ public interface ReportCommentRepository extends JpaRepository<ReportComment, Lo
     // 댓글 신고 내역 조회
     List<ReportComment> findByUser_UserPK(int userPK);
 
-    ReportComment[] findByReportedUser(UserEntity user);
+    // 배열 → List로 변경
+    List<ReportComment> findByReportedUser(UserEntity user);
 }
