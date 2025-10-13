@@ -4,6 +4,7 @@ import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.user.api.dto.UserDTO;
 import com.example.DOTORY.user.application.LoginService;
 import com.example.DOTORY.user.application.SNSLoginService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,7 @@ public class LoginController {
     private final SNSLoginService snsLoginService;
 
     // 일반 로그인
+    @Operation(summary = "로그인 - 일반 로그인", description = "아이디, 비밀번호를 입력하는 일반 로그인 기능")
     @PostMapping("/loginConfirm")
     public ResponseEntity<ApiResponse<Map<String, String>>> loginConfirm(@RequestBody UserDTO userDTO) {
         String token = loginService.loginConfirm(userDTO);
@@ -36,6 +38,7 @@ public class LoginController {
     }
 
     // 카카오 SNS 로그인
+    @Operation(summary = "로그인 - 카카오 로그인", description = "sns로그인 중 카카오 로그인.")
     @PostMapping("/sns/kakao")
     public ResponseEntity<ApiResponse<Map<String, String>>> kakaoLogin(@RequestBody Map<String, String> body) {
         String token = snsLoginService.loginWithKakaoAndReturnJwt(
@@ -45,6 +48,7 @@ public class LoginController {
     }
 
     // 네이버 SNS 로그인
+    @Operation(summary = "로그인 - 네이버 로그인", description = "sns 로그인 중 네이버 로그인.")
     @PostMapping("/sns/naver")
     public ResponseEntity<ApiResponse<Map<String, String>>> naverLogin(@RequestBody Map<String, String> body) {
         String token = snsLoginService.loginWithNaverAndReturnJwt(
