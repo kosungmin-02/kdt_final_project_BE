@@ -11,23 +11,27 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @RequiredArgsConstructor
-@Configuration      // UserSecurityConfig가 의존성 설정이 되도록 어노테이션 부착.
-@EnableWebSecurity  // Security를 지금 사용하는 웹에 적용하겠다는 의미로 어노테이션 부착.
+@Configuration
+@EnableWebSecurity
 public class UserSecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtProvider jwtProvider;
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
-    @Bean
-    // 시큐리티 default 기능들 잠시 꺼놓기 설정
-    SecurityFilterChain filterChain(HttpSecurity http, UserRepository userRepository) throws Exception{
 
-        // CSRF와 CORS 비활성화. (SPA + API)이기 때문.
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http, UserRepository userRepository) throws Exception {
         http
-                .cors(cors->cors.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
                 .csrf(csrf -> csrf.disable());
+
         http
                 .formLogin(login -> login.disable())
                 .exceptionHandling(ex -> ex
@@ -37,38 +41,41 @@ public class UserSecurityConfig {
                             response.getWriter().write("{\"error\": \"Unauthorized\"}");
                         })
                 )
-
-
-                // REST API + React SPA 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        // swagger 허용
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-
                         .requestMatchers("/api/users/**",
                                 "/oauth2/**",
                                 "/api/posts/*/comments",
-                                // 테스트를 위해서 관리자 페이지를 모두 허용으로 해놓았음.
                                 "/api/admin/**",
-                                "/api/posts/*/likes/count").permitAll() // 로그인/회원가입 API 허용
-
-                        .anyRequest().authenticated() // 나머지는 인증 필요
+                                "/api/posts/*/likes/count").permitAll()
+                        .anyRequest().authenticated()
                 )
-
-                // OAuth2 로그인 설정
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .successHandler(customOAuth2SuccessHandler) // 커스텀 핸들러 연결
+                        .successHandler(customOAuth2SuccessHandler)
                 );
 
-        // JWT filter
         http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, userRepository),
                 UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*", "*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

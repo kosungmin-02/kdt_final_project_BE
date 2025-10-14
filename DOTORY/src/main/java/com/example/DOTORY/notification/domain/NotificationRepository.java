@@ -2,10 +2,15 @@ package com.example.DOTORY.notification.domain;
 
 import com.example.DOTORY.notification.application.port.NotificationPort;
 import com.google.api.core.ApiFuture;
+import com.google.api.core.ApiFutureCallback;
+import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
-import com.google.firebase.cloud.FirestoreClient;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.WriteResult;
+import com.google.common.util.concurrent.MoreExecutors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
@@ -15,13 +20,10 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class NotificationRepository implements NotificationPort {
 
     private final Firestore db;
-
-    public NotificationRepository() {
-        this.db = FirestoreClient.getFirestore();
-    }
 
     @Override
     public List<Notification> findAllByUserId(String userId) {
@@ -45,5 +47,21 @@ public class NotificationRepository implements NotificationPort {
             Thread.currentThread().interrupt();
             return List.of();
         }
+    }
+
+    @Override
+    public void save(Notification notification, String userId) {
+        ApiFuture<DocumentReference> future = db.collection("users").document(userId).collection("notifications").add(notification);
+        ApiFutures.addCallback(future, new ApiFutureCallback<DocumentReference>() {
+            @Override
+            public void onFailure(Throwable t) {
+                log.error("Firestore에 알림 저장 실패: userId={}", userId, t);
+            }
+
+            @Override
+            public void onSuccess(DocumentReference result) {
+                log.info("Firestore에 알림 저장 성공: userId={}, path={}", userId, result.getPath());
+            }
+        }, MoreExecutors.directExecutor());
     }
 }

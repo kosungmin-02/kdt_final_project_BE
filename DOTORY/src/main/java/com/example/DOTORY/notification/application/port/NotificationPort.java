@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface NotificationPort {
     List<Notification> findAllByUserId(String userId);
+    void save(Notification notification, String userId);
 }
