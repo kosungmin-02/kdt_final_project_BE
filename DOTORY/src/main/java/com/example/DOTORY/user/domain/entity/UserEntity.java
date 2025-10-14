@@ -6,9 +6,10 @@ import lombok.*;
 // 데이터베이스 테이블과 1:1 매칭되는 테이블
 @Entity
 @Table(name="USER")    // 매칭되는 테이블은 USER라는 이름의 테이블.
-@Data // getter, setter등 사용하기 위함
-
-// 모든 멤버 필드들을 파라미터로 받아서 객체 생성하고자 생성자 어노테이션 사용.
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
