@@ -31,6 +31,7 @@ public class Comment extends BaseEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent; //대댓글
 
+    @Builder.Default
     private boolean isdeleted = false; // 삭제 여부
 
 }

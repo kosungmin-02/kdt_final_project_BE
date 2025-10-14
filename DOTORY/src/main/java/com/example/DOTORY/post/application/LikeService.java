@@ -1,5 +1,7 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.notification.application.port.NotificationPort;
 import com.example.DOTORY.notification.domain.Notification;
 import com.example.DOTORY.post.domain.entity.Like;
@@ -26,7 +28,7 @@ public class LikeService {
     @Transactional
     public String toggleLike(Long postId, int userPK) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         Optional<Like> existing = likeRepository.findByPost_PostIdAndUser_UserPK(postId, userPK);
 
@@ -35,7 +37,7 @@ public class LikeService {
             return "좋아요 취소";
         } else {
             UserEntity liker = userRepository.findById(userPK)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
             Like like = Like.builder()
                     .post(post)
@@ -43,7 +45,6 @@ public class LikeService {
                     .build();
             likeRepository.save(like);
 
-            // 알림 로직 추가
             UserEntity postAuthor = post.getUser();
             if (postAuthor.getUserPK() != liker.getUserPK()) {
                 String message = liker.getUserNickname() + "님이 회원님의 게시글을 좋아합니다.";

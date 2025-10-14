@@ -3,6 +3,8 @@ package com.example.DOTORY.admin.application;
 import com.example.DOTORY.admin.api.dto.AdminCheckUserDTO;
 import com.example.DOTORY.admin.api.dto.AdminCheckUserReportDTO;
 import com.example.DOTORY.admin.api.dto.UserAgreeInfoDTO;
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.post.domain.entity.*;
 import com.example.DOTORY.post.domain.repository.ReportCommentRepository;
 import com.example.DOTORY.post.domain.repository.ReportRepository;
@@ -30,16 +32,12 @@ public class AdminUserService {
     private final ReportRepository reportPostRepository;
     private final ReportCommentRepository reportCommentRepository;
 
-    // [공통] - 회원 DTO 변환용 메소드
     private AdminCheckUserDTO toAdminCheckUserDTO(UserEntity user) {
-
-        // SNS 연결 여부
         List<String> snsProviders = new ArrayList<>();
         for (UserSNSEntity sns : snsRepository.findByUser(user)) {
             snsProviders.add(sns.getProvider().name());
         }
 
-        // 선택약관 어떤거 동의했는지 목록
         List<UserAgreeInfoDTO> agreements = new ArrayList<>();
         for (UserAgreeEntity agree : agreeRepository.findByUser(user)) {
             agreements.add(new UserAgreeInfoDTO(
@@ -49,39 +47,33 @@ public class AdminUserService {
             ));
         }
 
-        // 신고당한 내역이 뭐있는지 목록
         List<AdminCheckUserReportDTO> reports = new ArrayList<>();
-        // 신고당한 목록
-        // 게시글 신고
         for (ReportPost rp : reportPostRepository.findByReportedUser(user)) {
             reports.add(buildReportDTO(
                     rp.getReportId(),
                     "게시물",
                     rp.getPost().getPostId(),
-                    rp.getCategory(),         // ReportReason Enum
+                    rp.getCategory(),
                     rp.getReportContent(),
                     rp.getReportDate(),
-                    rp.getReportConfirm(),  // ReportConfirm Enum
+                    rp.getReportConfirm(),
                     rp.getConfirmDate()
             ));
         }
 
-        // 댓글 신고
         for (ReportComment rc : reportCommentRepository.findByReportedUser(user)) {
             reports.add(buildReportDTO(
                     rc.getReportId(),
                     "댓글",
                     rc.getComment().getCommentId(),
-                    rc.getCategory(),        // ReportReason enum
+                    rc.getCategory(),
                     rc.getReportContent(),
                     rc.getReportDate(),
-                    rc.getReportConfirm(), // ReportConfirm enum
+                    rc.getReportConfirm(),
                     rc.getConfirmDate()
             ));
         }
 
-
-        // dto로 반환
         return new AdminCheckUserDTO(
                 user.getUserPK(),
                 user.getUserName(),
@@ -96,12 +88,11 @@ public class AdminUserService {
         );
     }
 
-    // [공통] - 신고 DTO 생성
     private AdminCheckUserReportDTO buildReportDTO(
             Long reportId,
             String type,
             Long targetId,
-            ReportCategory category,   // enum -> entity
+            ReportCategory category,
             String reportContent,
             java.time.LocalDateTime reportDate,
             ReportConfirm confirmEnum,
@@ -113,8 +104,8 @@ public class AdminUserService {
                 reportId,
                 type,
                 targetId,
-                category != null ? category.getReason() : null,       // 영어 코드 → reason
-                category != null ? category.getCategoryName() : null, // 한글 설명 -> categoryName
+                category != null ? category.getReason() : null,
+                category != null ? category.getCategoryName() : null,
                 reportContent,
                 reportDate,
                 confirmEnum != null ? confirmEnum.name() : null,
@@ -124,9 +115,6 @@ public class AdminUserService {
         );
     }
 
-
-
-    // 전체 회원 조회하기
     @Transactional(readOnly = true)
     public List<AdminCheckUserDTO> getAllUsers() {
         List<UserEntity> users = userRepository.findAll();
@@ -137,19 +125,17 @@ public class AdminUserService {
         return result;
     }
 
-    // 회원 상세 조회 - [공통] toAdminCheckUserDTO 활용
     @Transactional(readOnly = true)
     public AdminCheckUserDTO getUserDetail(int userPK) {
         UserEntity user = userRepository.findById(userPK)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
-        return toAdminCheckUserDTO(user); // DTO 변환 호출
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        return toAdminCheckUserDTO(user);
     }
 
-    // 회원 강제 탈퇴
     @Transactional
     public void DeleteUser(int userPK) {
         UserEntity user = userRepository.findById(userPK)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         user.setUserStatus(UserStatus.DELETED);
         userRepository.save(user);
     }
