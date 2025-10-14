@@ -1,5 +1,7 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.notification.application.port.NotificationPort;
+import com.example.DOTORY.notification.domain.Notification;
 import com.example.DOTORY.post.api.dto.request.CommentRequest;
 import com.example.DOTORY.post.api.dto.response.CommentResponse;
 import com.example.DOTORY.post.domain.entity.Comment;
@@ -24,6 +26,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationPort notificationPort;
 
     /** 댓글 작성 */
     public CommentResponse addComment(Long postId, CommentRequest request, int userPK) {
@@ -47,7 +50,22 @@ public class CommentService {
                 .isdeleted(false)
                 .build();
 
-        return CommentResponse.from(commentRepository.save(comment));
+        Comment savedComment = commentRepository.save(comment);
+
+        // 알림 로직 추가
+        UserEntity postAuthor = post.getUser();
+        if (postAuthor.getUserPK() != user.getUserPK()) {
+            String message = user.getUserNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
+            Notification notification = Notification.builder()
+                    .message(message)
+                    .relatedUrl("/posts/" + post.getPostId())
+                    .isRead(false)
+                    .createdAt(System.currentTimeMillis())
+                    .build();
+            notificationPort.save(notification, String.valueOf(postAuthor.getUserPK()));
+        }
+
+        return CommentResponse.from(savedComment);
     }
 
     /** 댓글 수정 */

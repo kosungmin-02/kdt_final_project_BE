@@ -5,7 +5,10 @@ import lombok.*;
 
 @Entity
 @Table(name="USERSNS")
-@Data
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

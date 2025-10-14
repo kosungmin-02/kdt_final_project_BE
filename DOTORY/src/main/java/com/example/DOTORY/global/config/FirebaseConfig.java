@@ -1,8 +1,11 @@
 package com.example.DOTORY.global.config;
 
+import com.google.cloud.firestore.Firestore;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
+import com.google.firebase.cloud.FirestoreClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
@@ -16,7 +19,6 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            // resources 디렉토리의 파일을 읽기 위해(비공개 키)
             ClassPathResource resource = new ClassPathResource("dotory-7c1fe-firebase-adminsdk-fbsvc-3aa390a50b.json");
             InputStream serviceAccount = resource.getInputStream();
 
@@ -24,13 +26,16 @@ public class FirebaseConfig {
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
 
-            // 중복 처기화 방지
             if (FirebaseApp.getApps().isEmpty()) {
                 FirebaseApp.initializeApp(options);
             }
         } catch (IOException e) {
-            // 파일 읽기 실패 시 예외 처리
-            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize Firebase", e);
         }
+    }
+
+    @Bean
+    public Firestore firestore() {
+        return FirestoreClient.getFirestore();
     }
 }

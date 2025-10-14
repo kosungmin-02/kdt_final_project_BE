@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notification {
+public class    Notification {
 
     private String id;
     private String message;
