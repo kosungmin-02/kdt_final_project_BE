@@ -1,5 +1,7 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.notification.application.port.NotificationPort;
 import com.example.DOTORY.notification.domain.Notification;
 import com.example.DOTORY.post.api.dto.request.CommentRequest;
@@ -28,19 +30,18 @@ public class CommentService {
     private final UserRepository userRepository;
     private final NotificationPort notificationPort;
 
-    /** 댓글 작성 */
     public CommentResponse addComment(Long postId, CommentRequest request, int userPK) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         Comment parent = null;
         if (request.getParentId() != null) {
             parent = commentRepository.findById(request.getParentId())
-                    .orElseThrow(() -> new IllegalArgumentException("부모 댓글을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND, "Parent comment not found."));
         }
 
         UserEntity user = userRepository.findById(userPK)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         Comment comment = Comment.builder()
                 .content(request.getContent())
@@ -52,7 +53,6 @@ public class CommentService {
 
         Comment savedComment = commentRepository.save(comment);
 
-        // 알림 로직 추가
         UserEntity postAuthor = post.getUser();
         if (postAuthor.getUserPK() != user.getUserPK()) {
             String message = user.getUserNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
@@ -68,36 +68,33 @@ public class CommentService {
         return CommentResponse.from(savedComment);
     }
 
-    /** 댓글 수정 */
     public CommentResponse updateComment(Long commentId, CommentRequest request, int userPK) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         UserEntity user = userRepository.findByUserPK(userPK)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // 권한 체크
-        // 댓글 작성자도 아니고 관리자도 아니라면 댓글 수정 불가능.
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
         if (comment.getUser().getUserPK() != user.getUserPK() && user.getUserRole() != UserRole.ADMIN) {
-            throw new IllegalArgumentException("본인의 댓글만 수정할 수 있습니다.");
+            throw new GeneralException(ErrorStatus.ACCESS_DENIED, "본인의 댓글만 수정할 수 있습니다.");
         }
 
         comment.setContent(request.getContent());
         return CommentResponse.from(comment);
     }
 
-    /** 댓글 삭제 */
     public void deleteComment(Long commentId, int userPK) {
         Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         UserEntity user = userRepository.findByUserPK(userPK)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-        // 권한 체크
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
         if (comment.getUser().getUserPK() != userPK && user.getUserRole() != UserRole.ADMIN) {
-            throw new IllegalArgumentException("본인의 댓글만 삭제할 수 있습니다.");
+            throw new GeneralException(ErrorStatus.ACCESS_DENIED, "본인의 댓글만 삭제할 수 있습니다.");
         }
 
-        comment.setIsdeleted(true); // 실제 삭제 대신 표시만
+        comment.setIsdeleted(true);
     }
 
     @Transactional(readOnly = true)

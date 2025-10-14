@@ -1,5 +1,7 @@
 package com.example.DOTORY.admin.application;
 
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.post.api.dto.request.ReportCategoryDTO;
 import com.example.DOTORY.post.api.dto.response.ReportCategoryResponseDTO;
 import com.example.DOTORY.post.domain.entity.ReportCategory;
@@ -41,7 +43,7 @@ public class AdminReportCategoryService {
     @Transactional
     public ReportCategory updateCategory(Long id, ReportCategoryDTO dto) {
         ReportCategory category = reportCategoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리를 찾을 수 없습니다. id=" + id));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다. id=" + id));
 
         category.setCategoryName(dto.categoryName());
         category.setReason(dto.reason());

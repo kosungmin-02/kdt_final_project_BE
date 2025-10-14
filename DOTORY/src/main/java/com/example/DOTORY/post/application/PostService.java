@@ -1,5 +1,7 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.post.api.dto.request.PostRequest;
 import com.example.DOTORY.post.api.dto.response.FeedResponse;
 import com.example.DOTORY.post.api.dto.response.PostDetailResponse;
@@ -37,7 +39,6 @@ public class PostService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    /** 이미지 업로드 공통 메서드 */
     private List<String> saveImages(MultipartFile[] images) {
         List<String> imageUrls = new ArrayList<>();
         if (images != null) {
@@ -50,7 +51,7 @@ public class PostService {
                         Files.write(path, image.getBytes());
                         imageUrls.add("/" + UPLOAD_DIR + fileName);
                     } catch (IOException e) {
-                        throw new RuntimeException("파일 업로드 실패", e);
+                        throw new GeneralException(ErrorStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
                     }
                 }
             }
@@ -58,7 +59,6 @@ public class PostService {
         return imageUrls;
     }
 
-    /** 게시글 생성 */
     public PostResponse createPost(PostRequest request, MultipartFile[] images, UserEntity user) {
         List<String> imageUrls = saveImages(images);
         String thumbnailUrl = imageUrls.isEmpty() ? null : imageUrls.get(0);
@@ -76,16 +76,13 @@ public class PostService {
         return toPostResponse(saved);
     }
 
-    /** 게시글 수정 */
     @Transactional
     public PostResponse updatePost(Long postId, PostRequest request, MultipartFile[] images, UserEntity user) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 권한 체크
-        // 작성자도 아니고 관리자도 아니면 게시글 수정 불가능.
         if (post.getUser().getUserPK() != user.getUserPK() && user.getUserRole() != UserRole.ADMIN )   {
-            throw new IllegalArgumentException("본인의 게시글만 수정할 수 있습니다.");
+            throw new GeneralException(ErrorStatus.ACCESS_DENIED, "본인의 게시글만 수정할 수 있습니다.");
         }
 
         List<String> imageUrls = images != null && images.length > 0 ? saveImages(images) : post.getImageUrls();
@@ -100,39 +97,32 @@ public class PostService {
         return toPostResponse(updated);
     }
 
-    /** 게시글 삭제 */
     @Transactional
     public void deletePost(Long postId, UserEntity user) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
-        // 권한 체크
-        // 작성자도 아니고 관리자도 아니라면 글 삭제 불가능.
         if (post.getUser().getUserPK() != user.getUserPK() &&  user.getUserRole() != UserRole.ADMIN) {
-            throw new IllegalArgumentException("본인의 게시글만 삭제할 수 있습니다.");
+            throw new GeneralException(ErrorStatus.ACCESS_DENIED, "본인의 게시글만 삭제할 수 있습니다.");
         }
 
         postRepository.delete(post);
     }
 
-    /** 게시글 단건 조회 */
     public PostResponse getPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
         return toPostResponse(post);
     }
 
-
-    /** 게시글 목록 조회 */
     public Page<PostResponse> getPostList(Pageable pageable) {
         return postRepository.findAll(pageable)
                 .map(this::toPostResponse);
     }
 
-    /** 게시글 상세 조회 */
     public PostDetailResponse getPostDetail(Long postId, Integer viewerUserPK) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         long likeCount = likeRepository.countByPost_PostId(postId);
         long commentCount = commentRepository.countByPost_PostId(postId);
@@ -157,7 +147,6 @@ public class PostService {
     }
 
     @Transactional
-    /** 사용자 피드 조회 */
     public Page<FeedResponse> getUserFeed(int userPK, Pageable pageable) {
         return postRepository.findByUser_UserPK(userPK, pageable)
                 .map(post -> FeedResponse.builder()
@@ -169,7 +158,6 @@ public class PostService {
                         .build());
     }
 
-    /** Post -> PostResponse 변환 공통 메서드 */
     private PostResponse toPostResponse(Post post) {
         return PostResponse.builder()
                 .postId(post.getPostId())

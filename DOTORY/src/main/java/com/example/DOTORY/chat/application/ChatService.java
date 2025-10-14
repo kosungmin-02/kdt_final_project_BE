@@ -6,6 +6,8 @@ import com.example.DOTORY.chat.domain.entity.ChatParticipant;
 import com.example.DOTORY.chat.domain.entity.ChatRoom;
 import com.example.DOTORY.chat.domain.repository.ChatParticipantRepository;
 import com.example.DOTORY.chat.domain.repository.ChatRoomRepository;
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import com.example.DOTORY.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,23 +30,21 @@ public class ChatService {
     @Transactional
     public ChatRoomResponseDto createGroupChatRoom(CreateGroupChatRequestDto request, int ownerPk) {
         UserEntity owner = userRepository.findById(ownerPk)
-                .orElseThrow(() -> new IllegalArgumentException("Owner not found"));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND, "Owner not found"));
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .roomName(request.roomName())
                 .roomType(ChatRoom.RoomType.GROUP)
                 .build();
 
-        // Add owner to participants
         ChatParticipant ownerParticipant = ChatParticipant.builder().user(owner).chatRoom(chatRoom).build();
         chatRoom.getParticipants().add(ownerParticipant);
 
-        // Add other users to participants
         if (request.userPks() != null) {
             for (Integer userPk : request.userPks()) {
                 UserEntity user = userRepository.findById(userPk)
-                        .orElseThrow(() -> new IllegalArgumentException("User not found: " + userPk));
-                if (!user.equals(owner)) { // Avoid adding owner twice
+                        .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+                if (!user.equals(owner)) {
                     ChatParticipant participant = ChatParticipant.builder().user(user).chatRoom(chatRoom).build();
                     chatRoom.getParticipants().add(participant);
                 }
@@ -58,10 +58,9 @@ public class ChatService {
     @Transactional
     public ChatRoomResponseDto findOrCreateOneOnOneChatRoom(int user1Pk, int user2Pk) {
         if (user1Pk == user2Pk) {
-            throw new IllegalArgumentException("Cannot create a chat room with yourself.");
+            throw new GeneralException(ErrorStatus.BAD_REQUEST, "Cannot create a chat room with yourself.");
         }
 
-        // Ensure consistent ordering of user IDs to find the room
         int smallerPk = Math.min(user1Pk, user2Pk);
         int largerPk = Math.max(user1Pk, user2Pk);
 
@@ -73,12 +72,12 @@ public class ChatService {
         }
 
         UserEntity user1 = userRepository.findById(user1Pk)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + user1Pk));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         UserEntity user2 = userRepository.findById(user2Pk)
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + user2Pk));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         ChatRoom chatRoom = ChatRoom.builder()
-                .roomName(null) // 1:1 chat has no name
+                .roomName(null)
                 .roomType(ChatRoom.RoomType.ONE_ON_ONE)
                 .build();
 
@@ -101,7 +100,7 @@ public class ChatService {
 
     public ChatRoomResponseDto findChatRoomById(Long roomId) {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("Chat room not found"));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "Chat room not found."));
         return ChatRoomResponseDto.from(chatRoom);
     }
 }

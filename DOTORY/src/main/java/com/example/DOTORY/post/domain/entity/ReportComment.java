@@ -50,6 +50,7 @@ public class ReportComment {
 
     // 신고 처리 여부
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private ReportConfirm reportConfirm = ReportConfirm.WAITING;
 
     // 신고 처리 완료 날짜

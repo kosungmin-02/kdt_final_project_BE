@@ -19,37 +19,34 @@ public class Post extends BaseEntity {
     private Long postId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userPK")    // 명시적으로 알 수 있게 하려고 외래키도 userPK로 작성함.
+    @JoinColumn(name = "userPK")
     private UserEntity user;
 
     private String title;
     private String content;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private List<String> imageUrls = new ArrayList<>();
 
-    // 썸네일
-    private String thumbnailUrl; // 첫 번째 이미지를 자동 세팅
-
-    // 초반 개발 이미지 세팅시 사용한 엔티티
-//    private String imageUrl;
+    private String thumbnailUrl;
 
     public void setImageUrls(List<String> imageUrls) {
         this.imageUrls = imageUrls;
         if(imageUrls != null && !imageUrls.isEmpty()) {
-            this.thumbnailUrl = imageUrls.get(0); // 첫 번째 이미지를 썸네일로 지정
+            this.thumbnailUrl = imageUrls.get(0);
         }
     }
 
-    // ===== 연관관계 매핑 =====
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Like> likes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
-
-
 }

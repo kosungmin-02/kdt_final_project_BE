@@ -1,5 +1,7 @@
 package com.example.DOTORY.post.application;
 
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.post.api.dto.request.ReportCommentRequest;
 import com.example.DOTORY.post.api.dto.request.ReportRequest;
 import com.example.DOTORY.post.api.dto.response.SimpleResponse;
@@ -28,29 +30,29 @@ public class ReportService {
     @Transactional
     public SimpleResponse reportPost(ReportRequest request) {
         Post post = postRepository.findById(request.getPostId())
-                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.POST_NOT_FOUND));
 
         UserEntity reporter = userRepository.findById(request.getReporterUserPK())
-                .orElseThrow(() -> new IllegalArgumentException("신고자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         UserEntity reported = post.getUser();
 
         if (reporter.getUserPK() == reported.getUserPK()) {
-            throw new IllegalArgumentException("본인 작성글은 신고할 수 없습니다.");
+            throw new GeneralException(ErrorStatus.BAD_REQUEST, "본인 작성글은 신고할 수 없습니다.");
         }
 
         if (reportRepository.existsByPost_PostIdAndUser_UserPK(request.getPostId(), reporter.getUserPK())) {
-            throw new IllegalArgumentException("이미 신고한 게시글입니다.");
+            throw new GeneralException(ErrorStatus.DUPLICATE_RESOURCE, "이미 신고한 게시글입니다.");
         }
 
         ReportCategory category = reportCategoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("신고 카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "신고 카테고리를 찾을 수 없습니다."));
 
         ReportPost report = ReportPost.builder()
                 .user(reporter)
                 .reportedUser(reported)
                 .post(post)
-                .category(category)   // 엔티티에 ReportCategory 객체 저장
+                .category(category)
                 .reportContent(request.getReportContent())
                 .reportDate(request.getReportDate())
                 .reportConfirm(ReportConfirm.WAITING)
@@ -63,7 +65,7 @@ public class ReportService {
                 .postId(saved.getPost().getPostId())
                 .userPK(saved.getUser().getUserPK())
                 .reportedUserPK(saved.getReportedUser().getUserPK())
-                .categoryName(saved.getCategory().getCategoryName()) // 이름 반환
+                .categoryName(saved.getCategory().getCategoryName())
                 .reportContent(saved.getReportContent())
                 .reportDate(saved.getReportDate())
                 .reportConfirm(saved.getReportConfirm())
@@ -73,24 +75,24 @@ public class ReportService {
     @Transactional
     public SimpleResponse reportComment(ReportCommentRequest request) {
         Comment comment = commentRepository.findById(request.getCommentId())
-                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
         UserEntity reporter = userRepository.findById(request.getReporterUserPK())
-                .orElseThrow(() -> new IllegalArgumentException("신고자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         UserEntity reported = comment.getUser();
 
         if (reporter.getUserPK() == reported.getUserPK()) {
-            throw new IllegalArgumentException("본인 댓글은 신고할 수 없습니다.");
+            throw new GeneralException(ErrorStatus.BAD_REQUEST, "본인 댓글은 신고할 수 없습니다.");
         }
 
         if (reportCommentRepository.existsByComment_CommentIdAndUser_UserPK(
                 request.getCommentId(), reporter.getUserPK())) {
-            throw new IllegalArgumentException("이미 신고한 댓글입니다.");
+            throw new GeneralException(ErrorStatus.DUPLICATE_RESOURCE, "이미 신고한 댓글입니다.");
         }
 
         ReportCategory category = reportCategoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("신고 카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "신고 카테고리를 찾을 수 없습니다."));
 
         ReportComment report = ReportComment.builder()
                 .user(reporter)

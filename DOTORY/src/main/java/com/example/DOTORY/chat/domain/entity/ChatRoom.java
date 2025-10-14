@@ -27,6 +27,7 @@ public class ChatRoom extends BaseEntity {
     private RoomType roomType;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ChatParticipant> participants = new ArrayList<>();
 
     public enum RoomType {
