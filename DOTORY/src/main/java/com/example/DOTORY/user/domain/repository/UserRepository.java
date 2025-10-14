@@ -18,6 +18,7 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     // 유저ID와 이메일로 유저 정보 조회
     public Optional<UserEntity> findByUserIDAndUserEmail(String userID, String userEmail);
 
+    // 로그아웃시에도 사용.
     Optional<UserEntity> findByUserEmail(String email);
 
     List<UserEntity> findByUserIDContainingIgnoreCase(String keyword);

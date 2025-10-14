@@ -57,6 +57,7 @@ public class AdminMessageController {
         return ResponseEntity.ok(ApiResponse.onSuccess(messages));
     }
 
+
     // 3. 메시지 읽음 처리
     @Operation(summary = "메시지 읽음 처리", description = "해당 메시지를 읽음 상태로 변경합니다.")
     @PostMapping("/{messageId}/read")

@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Tag(name = "로그인 API", description = "일반 로그인과 SNS 로그인 (카카오 / 네이버)")
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")   // 프론트와 연결을 위해 3000 -> 5173으로 변경.
 @Slf4j
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
