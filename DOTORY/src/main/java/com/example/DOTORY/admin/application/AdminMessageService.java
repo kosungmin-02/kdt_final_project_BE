@@ -30,7 +30,6 @@ public class AdminMessageService {
                 .messageTitle(title)
                 .messageContent(content)
                 .messageType(type)
-                .messageRead(false)
                 .build();
 
         return adminMessageRepository.save(message);
@@ -50,7 +49,6 @@ public class AdminMessageService {
                     .messageTitle(title)
                     .messageContent(content)
                     .messageType(type)
-                    .messageRead(false)
                     .build();
             adminMessageRepository.save(message);
         });
@@ -83,7 +81,6 @@ public class AdminMessageService {
         AdminMessageEntity message = adminMessageRepository.findById(messageId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "존재하지 않는 메시지입니다."));
 
-        message.setMessageRead(true);
         adminMessageRepository.save(message);
     }
 }

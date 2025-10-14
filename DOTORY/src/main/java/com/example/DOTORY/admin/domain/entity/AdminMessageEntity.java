@@ -25,7 +25,5 @@ public class AdminMessageEntity extends BaseEntity {
     private String messageTitle;
     private String messageContent;
     private MessageType messageType;  // 메세지 타입 - 경고 / 공지 / ....
-    @Builder.Default
-    private boolean messageRead = false; // 사용자가 읽었는지 아닌지 여부
 }
 
