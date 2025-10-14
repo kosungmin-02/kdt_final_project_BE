@@ -55,4 +55,14 @@ public class JwtProvider {
                 .getBody()
                 .getSubject();
     }
+
+    // 로그아웃 할 때 sns의 경우 사용하기 위한 용도 (이메일로 찾기)
+    public String getUserEmail(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("email", String.class);
+    }
 }
