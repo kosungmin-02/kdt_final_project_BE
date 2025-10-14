@@ -9,7 +9,7 @@ spring:
     time-zone: Asia/Seoul
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:kdt}
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dotory}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD}
 
