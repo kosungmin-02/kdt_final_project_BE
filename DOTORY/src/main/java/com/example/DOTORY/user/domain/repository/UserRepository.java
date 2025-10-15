@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     Optional<UserEntity> findByUserEmail(String email);
 
     List<UserEntity> findByUserIDContainingIgnoreCase(String keyword);
+
+    List<UserEntity> findAllByUserIDIn(List<String> userIDs);
 }

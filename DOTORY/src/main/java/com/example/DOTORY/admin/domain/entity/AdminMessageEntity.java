@@ -25,5 +25,6 @@ public class AdminMessageEntity extends BaseEntity {
     private String messageTitle;
     private String messageContent;
     private MessageType messageType;  // 메세지 타입 - 경고 / 공지 / ....
+    private boolean issent;
 }
 

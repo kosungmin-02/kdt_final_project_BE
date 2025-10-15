@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface AgreeRepository extends JpaRepository<AgreeEntity,Integer> {
     List<AgreeEntity> findByAgreeType(AgreeType agreeType);
+
+    boolean existsByAgreeTitle(String title);
 }
