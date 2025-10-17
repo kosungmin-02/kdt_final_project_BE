@@ -51,7 +51,8 @@ public class UserSecurityConfig {
                                 "/oauth2/**",
                                 "/api/posts/*/comments",
                                 "/api/admin/**",
-                                "/api/posts/*/likes/count").permitAll()
+                                "/api/posts/*/likes/count",
+                                "/uploads/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
@@ -70,7 +71,7 @@ public class UserSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*", "*"));
         configuration.setAllowCredentials(true);

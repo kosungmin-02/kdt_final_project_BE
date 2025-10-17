@@ -50,4 +50,9 @@ public class UserEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private UserStatus userStatus = UserStatus.ACTIVE;
+
+    @Column(name="USERAVATAR", length = 255)
+    private String userAvatar;  // 프로필 사진 URL
+
+
 }

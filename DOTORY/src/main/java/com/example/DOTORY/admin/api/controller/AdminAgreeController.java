@@ -3,19 +3,19 @@ package com.example.DOTORY.admin.api.controller;
 import com.example.DOTORY.admin.api.dto.DeleteAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UpdateAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UserInfoDTO;
+import com.example.DOTORY.admin.application.AdminAgreeService;
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.user.api.dto.AgreeDTO;
-import com.example.DOTORY.admin.application.AdminAgreeService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Admin Agree API", description = "관리자 기능 - 약관동의 관리하기 ( 전체 약관 조회 / 약관 수정 / 약관 동의 회원 목록 조회)")
 @RestController
 @RequestMapping("/api/admin/agree")
@@ -67,6 +67,7 @@ public class AdminAgreeController {
         }
     }
 
+    // 약관 추가하기
     @Operation(summary="약관 추가", description = "관리자가 약관 추가 가능. 제목, 내용, 약관 타입 선택 가능.")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<AgreeDTO>> createAgree(@RequestBody AgreeDTO dto) {

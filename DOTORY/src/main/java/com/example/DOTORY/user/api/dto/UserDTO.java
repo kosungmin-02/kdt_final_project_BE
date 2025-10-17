@@ -14,7 +14,8 @@ public record UserDTO(
         UserRole userRole,
         String userCreatedDate,
         String userUpdatedDate,
-        List<Integer> agree
+        List<Integer> agree,
+        String userAvatar
 
 ) implements Serializable {
 

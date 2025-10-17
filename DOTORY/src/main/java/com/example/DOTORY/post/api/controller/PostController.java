@@ -2,6 +2,7 @@ package com.example.DOTORY.post.api.controller;
 
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.global.security.CustomUserPrincipal;
+import com.example.DOTORY.global.util.MultipartInputStreamFileResource;
 import com.example.DOTORY.post.api.dto.request.PostRequest;
 import com.example.DOTORY.post.api.dto.response.FeedResponse;
 import com.example.DOTORY.post.api.dto.response.PostDetailResponse;
@@ -10,16 +11,22 @@ import com.example.DOTORY.post.application.PostService;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
@@ -29,10 +36,11 @@ public class PostController {
 
     /** 게시글 업로드 (텍스트만, 테스트용) */
     @Operation(summary = "게시글 작성 기능", description = "회원은 게시글을 작성할 수 있음. 텍스트만을 작성할 수 있음.")
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse<PostResponse>> createPost(
             @RequestBody PostRequest request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
+        log.info("CreatePost 호출");
         UserEntity user = principal.getUser();
         PostResponse response = postService.createPost(request, null, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
@@ -45,6 +53,8 @@ public class PostController {
             @RequestPart("post") PostRequest request,
             @RequestPart(value = "images", required = false) MultipartFile[] images,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        log.info("UploadFile 호출");
         UserEntity user = principal.getUser();
         PostResponse response = postService.createPost(request, images, user);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));
@@ -104,4 +114,42 @@ public class PostController {
         Page<FeedResponse> feed = postService.getUserFeed(userPK, pageable);
         return ResponseEntity.ok(ApiResponse.onSuccess(feed));
     }
+
+    // 중간 프록시 역할을 위한 FastAPI 호출
+    @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeImage(
+            @RequestPart("file") MultipartFile file,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        try {
+            // FastAPI URL
+            String fastApiUrl = "http://43.202.35.139:8000/api/analyze/hashtags";
+
+            System.out.println("FastAPI 호출 시작: 파일명 = " + file.getOriginalFilename());
+
+            // Multipart 요청 준비
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new MultipartInputStreamFileResource(file.getInputStream(), file.getOriginalFilename()));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.postForEntity(fastApiUrl, requestEntity, Map.class);
+
+            System.out.println("FastAPI 호출 완료, 상태 코드: " + response.getStatusCode());
+            System.out.println("FastAPI 응답 내용: " + response.getBody());
+
+            return ResponseEntity.ok(ApiResponse.onSuccess(response.getBody()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.onFailure("FASTAPI_ERROR", "FastAPI 호출 실패", null));
+
+        }
+    }
+
 }

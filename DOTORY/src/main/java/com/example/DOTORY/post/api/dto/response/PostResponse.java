@@ -1,22 +1,17 @@
 package com.example.DOTORY.post.api.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-public class PostResponse {
-
-    private Long postId;
-    private String title;
-    private String content;
-    private List<String> imageUrls;
-    private String thumbnailUrl;
-
-}
+public record PostResponse(
+        Long postId,
+        String caption,
+        List<String> imageUrls,
+        String thumbnailUrl,
+        // Decoration 관련 필드
+        String frameColor,
+        String framePattern,
+        String patternColor,
+        Double patternOpacity,
+        Integer rotation,
+        String keywords
+) {}
