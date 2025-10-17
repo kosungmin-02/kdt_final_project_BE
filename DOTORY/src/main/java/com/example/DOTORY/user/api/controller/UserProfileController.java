@@ -6,6 +6,7 @@ import com.example.DOTORY.user.application.UserProfileService;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import com.example.DOTORY.user.domain.entity.UserProfileEntity;
 import com.example.DOTORY.user.domain.repository.UserRepository;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class UserProfileController {
     private final UserRepository userRepository;
 
     // GET API: 로그인 유저 프로필 조회
+    @Operation(summary = "로그인 유저 프로필 조회 - 프론트 연동용", description = "로그인한 유저의 프로필 조회 - mbti, bio(한줄소개), birth(생년월일), avatar는 프로필 사진")
     @GetMapping("/me")
     public ResponseEntity<?> getProfile(@RequestHeader("Authorization") String authHeader) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -56,7 +58,7 @@ public class UserProfileController {
         }
     }
 
-
+    @Operation(summary = "프로필 업데이트", description = "프론트의 프로필 업데이트용 (mbti, bio, birth)")
     @PutMapping("/update")
     public ResponseEntity<String> updateProfile(
             @RequestHeader("Authorization") String authHeader,
