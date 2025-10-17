@@ -1,6 +1,8 @@
 package com.example.DOTORY.user.api.controller;
 
 import com.example.DOTORY.global.code.dto.ApiResponse;
+import com.example.DOTORY.global.code.status.ErrorStatus;
+import com.example.DOTORY.global.exception.GeneralException;
 import com.example.DOTORY.user.api.dto.UserDTO;
 import com.example.DOTORY.user.application.AgreeService;
 import com.example.DOTORY.user.application.EmailSendService;
@@ -14,13 +16,22 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -29,6 +40,7 @@ public class UserController {
     private final PasswordService passwordService;
     private final JwtProvider jwtProvider;
     private final AgreeService agreeService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "일반 회원 가입 용도", description = "일반 회원가입 용도로 약관동의 -> 회원정보 입력 등을 거쳐서 회원가입.")
     @PostMapping("/registerConfirm")
@@ -42,6 +54,8 @@ public class UserController {
     @Operation(summary = "이메일 인증 코드 전송", description = "이메일을 통해서 본인인증을 하고자 회원가입시 작성한 이메일로 인증 코드를 보냄.")
     @PostMapping("/emailVerification")
     public ResponseEntity<ApiResponse<Void>> sendEmailCode(@RequestParam("userEmail") String email, HttpSession session){
+        userService.checkEmailDuplicate(email);
+
         String code = emailSendService.makeEmailCode();
         try {
             emailSendService.sendEmailForCode(email, code);
@@ -100,9 +114,10 @@ public class UserController {
     }
 
     @Operation(summary = "프로필 수정", description = "로그인한 회원은 자신의 프로필 수정")
-    @PutMapping("/changeProfile")
-    public ResponseEntity<ApiResponse<Void>> changeProfile(
-            @RequestBody UserDTO userDTO,
+    @PutMapping(value = "/changeProfile", consumes = { "multipart/form-data" })
+    public ResponseEntity<ApiResponse<UserDTO>> changeProfile(
+            @RequestPart("user") UserDTO userDTO,
+            @RequestPart(value = "userAvatar", required = false) MultipartFile userAvatar,
             @RequestHeader("Authorization") String authHeader) {
 
         log.info("UserController - changeProfile(), userID = {}", userDTO.userID());
@@ -118,7 +133,65 @@ public class UserController {
             return ResponseEntity.status(401).body(ApiResponse.onFailure("UNAUTHORIZED", "권한 없음", null));
         }
 
-        userService.profileChangeConfirm(userDTO);
+        // 프로필 정보 업데이트
+        userService.profileChangeConfirm(userDTO, userAvatar);
+
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
+
+    @PostMapping("/mypage/passwordChangeConfirm")
+    public ResponseEntity<?> changePassword(
+            @RequestBody Map<String, String> req,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String token = authHeader.replace("Bearer ", "");
+        String loginUserID = jwtProvider.getUserIdFromToken(token);
+
+        String userID = req.get("userID");
+        String currentPassword = req.get("currentPassword");
+        String newPassword = req.get("newPassword");
+
+        if(!loginUserID.equals(userID)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("권한 없음");
+        }
+
+        try {
+            userService.changePassword(userID, currentPassword, newPassword);
+            return ResponseEntity.ok("비밀번호가 변경되었습니다.");
+        } catch (GeneralException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
+
+
+    @GetMapping("/avatar/{userID}")
+    public ResponseEntity<Resource> getAvatar(@PathVariable String userID) {
+        UserEntity user = userRepository.findByUserID(userID)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        if(user.getUserAvatar() == null) {
+            throw new GeneralException(ErrorStatus.USER_NOT_FOUND, "아바타가 없습니다.");
+        }
+
+        try {
+            // 실제 서버 경로
+            Path path = Paths.get("avatars/" + user.getUserAvatar().substring("/avatars/".length()));
+            Resource resource = new UrlResource(path.toUri());
+
+            if(!resource.exists()) {
+                throw new GeneralException(ErrorStatus.FILE_NOT_FOUND, "아바타 파일을 찾을 수 없습니다.");
+            }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, "image/png") // PNG이면 image/png
+                    .body(resource);
+
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.FILE_NOT_FOUND, "아바타 로드 실패");
+        }
+    }
+
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "Agree API", description = "약관 관련 API (필수약관/선택약관)")
 @RestController
 @RequestMapping("/api/users")

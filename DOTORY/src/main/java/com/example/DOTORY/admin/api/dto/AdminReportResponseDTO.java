@@ -1,6 +1,7 @@
 package com.example.DOTORY.admin.api.dto;
 
 import com.example.DOTORY.post.domain.entity.ReportConfirm;
+
 import java.time.LocalDateTime;
 
 public record AdminReportResponseDTO(

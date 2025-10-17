@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorStatus implements BaseErrorCode {
     // 400 Bad Request
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON400", "잘못된 요청입니다."),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "USER4001", "유효하지 않은 요청입니다."),
     VALIDATION_FAILED(HttpStatus.BAD_REQUEST, "VALID4001", "입력값 유효성 검증에 실패했습니다."),
     MISSING_PARAMETER(HttpStatus.BAD_REQUEST, "VALID4002", "필수 파라미터가 누락되었습니다."),
     TYPE_MISMATCH(HttpStatus.BAD_REQUEST, "VALID4003", "파라미터 타입이 올바르지 않습니다."),
@@ -36,6 +37,8 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER4043", "사용자를 찾을 수 없습니다."),
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4045", "게시글을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4047", "댓글을 찾을 수 없습니다."),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "FILE4049", "파일을 찾을 수 없습니다."),
+
 
     // 405 Method Not Allowed
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON405", "허용되지 않는 HTTP 메서드입니다."),
@@ -51,6 +54,8 @@ public enum ErrorStatus implements BaseErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB5003", "데이터베이스 처리 중 오류가 발생했습니다."),
     AI_ANALYSIS_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AI5004", "AI 분석 중 오류가 발생했습니다."),
     FILE_READ_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FILE5005", "파일 읽기에 실패했습니다."),
+    FILE_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE5006", "파일 저장에 실패했습니다."),
+    FILE_UPLOAD_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "FILE5007", "프로필 사진 저장에 실패했습니다."),
 
     // 502, 503, 504
     BAD_GATEWAY(HttpStatus.BAD_GATEWAY, "COMMON502", "불완전한 게이트웨이 응답을 받았습니다."),

@@ -1,14 +1,16 @@
 package com.example.DOTORY.admin.application;
 
 import com.example.DOTORY.admin.api.dto.AdminCheckUserReportDTO;
-import com.example.DOTORY.admin.api.dto.AdminReportUpdateRequestDTO;
 import com.example.DOTORY.admin.api.dto.AdminReportResponseDTO;
+import com.example.DOTORY.admin.api.dto.AdminReportUpdateRequestDTO;
 import com.example.DOTORY.global.code.status.ErrorStatus;
 import com.example.DOTORY.global.exception.GeneralException;
-import com.example.DOTORY.post.domain.entity.*;
+import com.example.DOTORY.post.domain.entity.ReportCategory;
+import com.example.DOTORY.post.domain.entity.ReportComment;
+import com.example.DOTORY.post.domain.entity.ReportPost;
+import com.example.DOTORY.post.domain.repository.ReportCategoryRepository;
 import com.example.DOTORY.post.domain.repository.ReportCommentRepository;
 import com.example.DOTORY.post.domain.repository.ReportRepository;
-import com.example.DOTORY.post.domain.repository.ReportCategoryRepository;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import com.example.DOTORY.user.domain.repository.UserRepository;
 import jakarta.transaction.Transactional;

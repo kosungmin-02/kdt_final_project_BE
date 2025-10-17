@@ -1,8 +1,8 @@
 package com.example.DOTORY.admin.api.controller;
 
 import com.example.DOTORY.admin.api.dto.AdminCheckUserReportDTO;
-import com.example.DOTORY.admin.api.dto.AdminReportUpdateRequestDTO;
 import com.example.DOTORY.admin.api.dto.AdminReportResponseDTO;
+import com.example.DOTORY.admin.api.dto.AdminReportUpdateRequestDTO;
 import com.example.DOTORY.admin.application.AdminReportService;
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/admin/reports")
 @RequiredArgsConstructor

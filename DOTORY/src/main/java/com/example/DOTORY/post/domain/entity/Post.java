@@ -22,8 +22,7 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "userPK")
     private UserEntity user;
 
-    private String title;
-    private String content;
+    private String caption;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
@@ -49,4 +48,8 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Decoration decoration;
+
 }
