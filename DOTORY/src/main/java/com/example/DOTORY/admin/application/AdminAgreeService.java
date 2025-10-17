@@ -71,4 +71,25 @@ public class AdminAgreeService {
         agreeRepository.delete(agree);
         agreeRepository.flush();
     }
+
+    @Transactional
+    public AgreeDTO createAgree(String title, String content, AgreeType type) {
+        // 이미 동일한 제목의 약관이 존재하는지 체크 (중복 방지용)
+        boolean exists = agreeRepository.existsByAgreeTitle(title);
+        if (exists) {
+            throw new GeneralException(ErrorStatus.CONFLICT, "이미 존재하는 약관 제목입니다.");
+        }
+
+        // 새 약관 엔티티 생성
+        AgreeEntity newAgree = new AgreeEntity();
+        newAgree.setAgreeTitle(title);
+        newAgree.setAgreeContent(content);
+        newAgree.setAgreeType(type);
+
+        // 저장
+        AgreeEntity saved = agreeRepository.save(newAgree);
+
+        return new AgreeDTO(saved);
+    }
+
 }

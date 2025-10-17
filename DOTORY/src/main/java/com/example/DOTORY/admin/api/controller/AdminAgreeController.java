@@ -3,12 +3,14 @@ package com.example.DOTORY.admin.api.controller;
 import com.example.DOTORY.admin.api.dto.DeleteAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UpdateAgreeDTO;
 import com.example.DOTORY.admin.api.dto.UserInfoDTO;
+import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.user.api.dto.AgreeDTO;
 import com.example.DOTORY.admin.application.AdminAgreeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,5 +66,17 @@ public class AdminAgreeController {
             return new DeleteAgreeDTO(false, e.getMessage());
         }
     }
+
+    @Operation(summary="약관 추가", description = "관리자가 약관 추가 가능. 제목, 내용, 약관 타입 선택 가능.")
+    @PostMapping("/create")
+    public ResponseEntity<ApiResponse<AgreeDTO>> createAgree(@RequestBody AgreeDTO dto) {
+        AgreeDTO created = adminAgreeService.createAgree(
+                dto.agreeTitle(),
+                dto.agreeContent(),
+                dto.agreeType()
+        );
+        return ResponseEntity.ok(ApiResponse.onSuccess(created));
+    }
+
 
 }
