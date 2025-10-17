@@ -139,6 +139,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경용 - 현재 비밀번호 / 새로운 비밀번호 입력 후 저장하기")
     @PostMapping("/mypage/passwordChangeConfirm")
     public ResponseEntity<?> changePassword(
             @RequestBody Map<String, String> req,
@@ -167,6 +168,7 @@ public class UserController {
 
 
 
+    @Operation(summary = "프로필사진 업로드용", description = "프로필 사진 업로드 후 저장까지, 기본 이미지는 백단에 없습니다.")
     @GetMapping("/avatar/{userID}")
     public ResponseEntity<Resource> getAvatar(@PathVariable String userID) {
         UserEntity user = userRepository.findByUserID(userID)

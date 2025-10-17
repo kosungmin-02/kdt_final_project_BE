@@ -43,6 +43,7 @@ public class AgreeController {
         return new SaveAgreementsResponse(userOptionalList);
     }
 
+
     public static class UserAgreementsRequest {
         private List<Integer> agreements;
 

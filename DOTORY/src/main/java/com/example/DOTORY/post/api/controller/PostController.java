@@ -116,6 +116,7 @@ public class PostController {
     }
 
     // 중간 프록시 역할을 위한 FastAPI 호출
+    @Operation(summary = "FastAPI 호출", description = "기존에 프론트에 연결되어있던 FastAPI를 보안 문제 등으로 인하여 백단이 중간 프록시 역할을 하도록 백단에 연결하였습니다.")
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeImage(
             @RequestPart("file") MultipartFile file,
