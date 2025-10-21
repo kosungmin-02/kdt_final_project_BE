@@ -2,7 +2,6 @@ package com.example.DOTORY.chat.api.controller;
 
 import com.example.DOTORY.chat.api.dto.response.ChatRoomResponseDto;
 import com.example.DOTORY.chat.api.dto.request.CreateGroupChatRequestDto;
-import com.example.DOTORY.chat.api.dto.request.CreateOneOnOneChatRequestDto;
 import com.example.DOTORY.chat.application.ChatService;
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.global.security.CustomUserPrincipal;
@@ -32,15 +31,6 @@ public class ChatController {
         return ResponseEntity.ok(ApiResponse.onSuccess(chatRoom));
     }
 
-    @Operation(summary = "1:1 채팅방 생성 또는 조회")
-    @PostMapping("/rooms/one-on-one")
-    public ResponseEntity<ApiResponse<ChatRoomResponseDto>> createOneOnOneChatRoom(
-            @RequestBody CreateOneOnOneChatRequestDto request,
-            @AuthenticationPrincipal CustomUserPrincipal principal) {
-        ChatRoomResponseDto chatRoom = chatService.findOrCreateOneOnOneChatRoom(principal.getUser().getUserPK(), request.otherUserPk());
-        return ResponseEntity.ok(ApiResponse.onSuccess(chatRoom));
-    }
-
     @Operation(summary = "내 채팅방 목록 조회")
     @GetMapping("/rooms")
     public ResponseEntity<ApiResponse<List<ChatRoomResponseDto>>> getMyChatRooms(
@@ -54,5 +44,23 @@ public class ChatController {
     public ResponseEntity<ApiResponse<ChatRoomResponseDto>> getChatRoomById(@PathVariable Long id) {
         ChatRoomResponseDto chatRoom = chatService.findChatRoomById(id);
         return ResponseEntity.ok(ApiResponse.onSuccess(chatRoom));
+    }
+
+    @Operation(summary = "그룹 채팅방 검색")
+    @GetMapping("/rooms/search")
+    public ResponseEntity<ApiResponse<List<ChatRoomResponseDto>>> searchGroupChatRooms(
+            @RequestParam String roomName,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        List<ChatRoomResponseDto> chatRooms = chatService.searchGroupChatRooms(roomName, principal.getUser().getUserPK());
+        return ResponseEntity.ok(ApiResponse.onSuccess(chatRooms));
+    }
+
+    @Operation(summary = "그룹 채팅방 참여")
+    @PostMapping("/rooms/{roomId}/join")
+    public ResponseEntity<ApiResponse<Void>> joinGroupChatRoom(
+            @PathVariable Long roomId,
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+        chatService.joinGroupChatRoom(roomId, principal.getUser().getUserPK());
+        return ResponseEntity.ok(ApiResponse.onSuccess(null));
     }
 }

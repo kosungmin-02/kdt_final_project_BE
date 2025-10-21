@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ChatRoom extends BaseEntity {
+public class ChatRoom extends BaseEntity { 
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,16 +22,13 @@ public class ChatRoom extends BaseEntity {
     @Column(nullable = true) // 1:1 채팅은 이름이 없을 수 있음
     private String roomName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private RoomType roomType;
+    @Column(nullable = true)
+    private String roomImage;
+
+    @Column(nullable = true)
+    private String description;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<ChatParticipant> participants = new ArrayList<>();
-
-    public enum RoomType {
-        ONE_ON_ONE,
-        GROUP
-    }
 }
