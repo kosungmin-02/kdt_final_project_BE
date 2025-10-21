@@ -19,6 +19,8 @@ import com.example.DOTORY.user.domain.repository.UserAgreeRepository;
 import com.example.DOTORY.user.domain.repository.UserRepository;
 import com.example.DOTORY.user.domain.repository.UserSNSRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +51,7 @@ public class AdminUserService {
                     agree.getUserAgreeDate()
             ));
         }
+
 
         List<AdminCheckUserReportDTO> reports = new ArrayList<>();
         for (ReportPost rp : reportPostRepository.findByReportedUser(user)) {
@@ -119,13 +122,9 @@ public class AdminUserService {
     }
 
     @Transactional(readOnly = true)
-    public List<AdminCheckUserDTO> getAllUsers() {
-        List<UserEntity> users = userRepository.findAll();
-        List<AdminCheckUserDTO> result = new ArrayList<>();
-        for (UserEntity user : users) {
-            result.add(toAdminCheckUserDTO(user));
-        }
-        return result;
+    public Page<AdminCheckUserDTO> getAllUsers(Pageable pageable) {
+        Page<UserEntity> userEntitiesPage = userRepository.findAll(pageable);
+        return userEntitiesPage.map(this::toAdminCheckUserDTO);
     }
 
     @Transactional(readOnly = true)

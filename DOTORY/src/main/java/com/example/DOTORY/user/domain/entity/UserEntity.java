@@ -1,7 +1,13 @@
 package com.example.DOTORY.user.domain.entity;
 
+import com.example.DOTORY.post.domain.entity.ReportComment;
+import com.example.DOTORY.post.domain.entity.ReportPost;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // 데이터베이스 테이블과 1:1 매칭되는 테이블
 @Entity
@@ -53,6 +59,26 @@ public class UserEntity extends BaseEntity {
 
     @Column(name="USERAVATAR", length = 255)
     private String userAvatar;  // 프로필 사진 URL
+
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserSNSEntity> snsList = new ArrayList<>();
+
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserAgreeEntity> agreeList = new ArrayList<>();
+
+    // 💡 ReportPost (가정: mappedBy가 reportedUser라고 가정)
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY)
+    private List<ReportPost> reportedPosts = new ArrayList<>();
+
+    // 💡 ReportComment (가정: mappedBy가 reportedUser라고 가정)
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY)
+    private List<ReportComment> reportedComments = new ArrayList<>();
 
 
 }

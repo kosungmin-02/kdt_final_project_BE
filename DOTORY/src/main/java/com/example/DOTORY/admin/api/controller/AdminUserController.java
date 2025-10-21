@@ -5,6 +5,10 @@ import com.example.DOTORY.admin.application.AdminUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,14 +23,15 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    // 전체 회원 조회하기
-    @Operation(summary = "전체 회원 조회",
-            description = "관리자가 전체 회원 목록 조회할 수 있습니다.")
+    // 전체 회원 조회하기 (페이지네이션 적용)
+    @Operation(summary = "전체 회원 조회 (페이지네이션)",
+            description = "관리자가 전체 회원 목록을 페이지네이션으로 조회할 수 있습니다.")
 
     @GetMapping
-    public ResponseEntity<List<AdminCheckUserDTO>> getAllUsers() {
-        List<AdminCheckUserDTO> users = adminUserService.getAllUsers();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<Page<AdminCheckUserDTO>> getAllUsers(
+            @PageableDefault(size = 10, sort = "userPK", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<AdminCheckUserDTO> usersPage = adminUserService.getAllUsers(pageable);
+        return ResponseEntity.ok(usersPage);
     }
 
     // 특정 회원 조회하기
