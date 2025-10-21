@@ -34,7 +34,8 @@ public class ChatService {
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .roomName(request.roomName())
-                .roomType(ChatRoom.RoomType.GROUP)
+                .roomImage(request.roomImage())
+                .description(request.description())
                 .build();
 
         ChatParticipant ownerParticipant = ChatParticipant.builder().user(owner).chatRoom(chatRoom).build();
@@ -55,42 +56,6 @@ public class ChatService {
         return ChatRoomResponseDto.from(savedChatRoom);
     }
 
-    @Transactional
-    public ChatRoomResponseDto findOrCreateOneOnOneChatRoom(int user1Pk, int user2Pk) {
-        if (user1Pk == user2Pk) {
-            throw new GeneralException(ErrorStatus.BAD_REQUEST, "Cannot create a chat room with yourself.");
-        }
-
-        int smallerPk = Math.min(user1Pk, user2Pk);
-        int largerPk = Math.max(user1Pk, user2Pk);
-
-        Optional<ChatRoom> existingRoom = chatRoomRepository.findOneOnOneRoom(smallerPk, largerPk)
-                .filter(room -> room.getParticipants().size() == 2);
-
-        if (existingRoom.isPresent()) {
-            return ChatRoomResponseDto.from(existingRoom.get());
-        }
-
-        UserEntity user1 = userRepository.findById(user1Pk)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        UserEntity user2 = userRepository.findById(user2Pk)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-        ChatRoom chatRoom = ChatRoom.builder()
-                .roomName(null)
-                .roomType(ChatRoom.RoomType.ONE_ON_ONE)
-                .build();
-
-        ChatParticipant participant1 = ChatParticipant.builder().user(user1).chatRoom(chatRoom).build();
-        ChatParticipant participant2 = ChatParticipant.builder().user(user2).chatRoom(chatRoom).build();
-
-        chatRoom.getParticipants().add(participant1);
-        chatRoom.getParticipants().add(participant2);
-
-        ChatRoom savedChatRoom = chatRoomRepository.save(chatRoom);
-        return ChatRoomResponseDto.from(savedChatRoom);
-    }
-
     public List<ChatRoomResponseDto> findMyChatRooms(int userPk) {
         return chatParticipantRepository.findByUser_UserPK(userPk).stream()
                 .map(ChatParticipant::getChatRoom)
@@ -102,5 +67,41 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "Chat room not found."));
         return ChatRoomResponseDto.from(chatRoom);
+    }
+
+    public List<ChatRoomResponseDto> searchGroupChatRooms(String roomName, int userPk) {
+        List<ChatRoom> allGroupRooms = chatRoomRepository.findByRoomNameContaining(roomName);
+        List<ChatRoom> myRooms = chatParticipantRepository.findByUser_UserPK(userPk).stream()
+                .map(ChatParticipant::getChatRoom)
+                .toList();
+
+        return allGroupRooms.stream()
+                .filter(room -> !myRooms.contains(room))
+                .map(ChatRoomResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void joinGroupChatRoom(Long roomId, int userPk) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.RESOURCE_NOT_FOUND, "Chat room not found."));
+
+        UserEntity user = userRepository.findById(userPk)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        boolean isAlreadyParticipant = chatRoom.getParticipants().stream()
+                .anyMatch(p -> p.getUser().getUserPK() == userPk);
+
+        if (isAlreadyParticipant) {
+            throw new GeneralException(ErrorStatus.BAD_REQUEST, "User is already a participant in this chat room.");
+        }
+
+        ChatParticipant participant = ChatParticipant.builder()
+                .user(user)
+                .chatRoom(chatRoom)
+                .build();
+
+        chatRoom.getParticipants().add(participant);
+        chatRoomRepository.save(chatRoom);
     }
 }

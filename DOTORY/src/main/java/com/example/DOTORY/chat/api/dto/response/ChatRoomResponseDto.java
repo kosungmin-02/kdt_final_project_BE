@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 public record ChatRoomResponseDto(
         Long id,
         String roomName,
+        String roomImage,
+        String description,
         ChatRoom.RoomType roomType,
         List<ParticipantResponseDto> participants
 ) {
@@ -16,6 +18,8 @@ public record ChatRoomResponseDto(
         return new ChatRoomResponseDto(
                 chatRoom.getId(),
                 chatRoom.getRoomName(),
+                chatRoom.getRoomImage(),
+                chatRoom.getDescription(),
                 chatRoom.getRoomType(),
                 chatRoom.getParticipants().stream()
                         .map(p -> ParticipantResponseDto.from(p.getUser()))
