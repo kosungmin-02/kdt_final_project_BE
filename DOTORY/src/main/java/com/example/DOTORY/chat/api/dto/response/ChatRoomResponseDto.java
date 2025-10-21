@@ -11,7 +11,6 @@ public record ChatRoomResponseDto(
         String roomName,
         String roomImage,
         String description,
-        ChatRoom.RoomType roomType,
         List<ParticipantResponseDto> participants
 ) {
     public static ChatRoomResponseDto from(ChatRoom chatRoom) {
@@ -20,7 +19,6 @@ public record ChatRoomResponseDto(
                 chatRoom.getRoomName(),
                 chatRoom.getRoomImage(),
                 chatRoom.getDescription(),
-                chatRoom.getRoomType(),
                 chatRoom.getParticipants().stream()
                         .map(p -> ParticipantResponseDto.from(p.getUser()))
                         .collect(Collectors.toList())
