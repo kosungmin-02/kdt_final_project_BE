@@ -60,24 +60,31 @@ public class UserEntity extends BaseEntity {
     @Column(name="USERAVATAR", length = 255)
     private String userAvatar;  // 프로필 사진 URL
 
+    @Column(name="FCM_TOKEN", length = 255)
+    private String fcmToken; // FCM 토큰
+
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<UserSNSEntity> snsList = new ArrayList<>();
 
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<UserAgreeEntity> agreeList = new ArrayList<>();
 
     // 💡 ReportPost (가정: mappedBy가 reportedUser라고 가정)
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ReportPost> reportedPosts = new ArrayList<>();
 
     // 💡 ReportComment (가정: mappedBy가 reportedUser라고 가정)
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "reportedUser", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<ReportComment> reportedComments = new ArrayList<>();
 
 

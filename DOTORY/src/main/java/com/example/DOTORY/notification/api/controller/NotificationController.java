@@ -2,6 +2,7 @@ package com.example.DOTORY.notification.api.controller;
 
 import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.notification.api.dto.NotificationResponse;
+import com.example.DOTORY.notification.api.dto.FcmTokenRequestDto;
 import com.example.DOTORY.notification.application.NotificationService;
 import com.example.DOTORY.global.security.CustomUserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,16 @@ import java.util.List;
 public class NotificationController {
 
     private final NotificationService notificationService;
+
+    @Operation(summary = "FCM 토큰 등록")
+    @PostMapping("/register-fcm")
+    public ResponseEntity<ApiResponse<String>> registerFcmToken(
+            @AuthenticationPrincipal CustomUserPrincipal principal,
+            @RequestBody FcmTokenRequestDto requestDto) {
+        String currentUserId = String.valueOf(principal.getUser().getUserPK());
+        notificationService.registerFcmToken(currentUserId, requestDto.getToken());
+        return ResponseEntity.ok(ApiResponse.onSuccess("FCM token registered successfully."));
+    }
 
     @Operation(summary = "내 알림 목록 조회")
     @GetMapping
