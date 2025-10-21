@@ -158,8 +158,8 @@ public class PostController {
         }
     }
 
-    @Operation(summary = "해시태그 키워드로 게시글 목록 검색", description = "키워드와 정렬 기준(LATEST/POPULAR)에 따라 게시글 목록을 조회합니다.")
-    @GetMapping // GET /api/posts/search?keyword=키워드&sort=정렬기준
+    @Operation(summary = "해시태그 키워드로 게시글 목록 검색", description = "키워드와 정렬 기준(LATEST/POPULAR)에 따라 게시글목록을 조회합니다.")
+    @GetMapping("/search") // GET /api/posts/search?keyword=키워드&sort=정렬기준
     public ResponseEntity<ApiResponse<List<PostListResponse>>> searchPosts(
             @ModelAttribute PostSearchRequest request
     ) {
