@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     // 로그아웃시에도 사용.
     Optional<UserEntity> findByUserEmail(String email);
 
+    Optional<UserEntity> findByUserNickname(String userNickname);
+
     List<UserEntity> findByUserIDContainingIgnoreCase(String keyword);
 
     List<UserEntity> findAllByUserIDIn(List<String> userIDs);
