@@ -51,4 +51,12 @@ public class BookmarkService {
         return bookmarkRepository.countByPost_PostId(postId);
     }
 
+    public Iterable<Long> getBookmarksByUser(int userPK) {
+        // userPK로 북마크 목록 조회
+        return bookmarkRepository.findByUser_UserPK(userPK)
+                .stream()
+                .map(bookmark -> bookmark.getPost().getPostId()) // postId만 반환
+                .toList();
+    }
+
 }
