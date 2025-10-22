@@ -53,8 +53,7 @@ public class UserSecurityConfig {
                                 "/api/admin/**",
                                 "/api/posts/*/likes/count",
                                 "/uploads/**",
-                                "/api/chat**"
-                                ).permitAll()
+                                "/api/chat/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

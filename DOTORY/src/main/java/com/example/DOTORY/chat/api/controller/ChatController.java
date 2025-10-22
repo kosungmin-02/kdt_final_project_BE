@@ -13,6 +13,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+// --- ⬇️ (필수) Import 추가 ---
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
+// --- ⬆️ (필수) Import 추가 ---
 
 @Tag(name = "Chat", description = "채팅 관련 API")
 @RestController
@@ -23,11 +27,17 @@ public class ChatController {
     private final ChatService chatService;
 
     @Operation(summary = "그룹 채팅방 생성")
-    @PostMapping("/rooms/group")
+    // 💡 1. 'consumes' 속성 추가
+    @PostMapping(value = "/rooms/group", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<ChatRoomResponseDto>> createGroupChatRoom(
-            @RequestBody CreateGroupChatRequestDto request,
+            // 💡 2. @RequestBody -> @RequestPart("request")로 변경
+            @RequestPart("request") CreateGroupChatRequestDto request,
+            // 💡 3. 파일 파라미터 추가
+            @RequestPart(value = "roomImage", required = false) MultipartFile roomImage,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
-        ChatRoomResponseDto chatRoom = chatService.createGroupChatRoom(request, principal.getUser().getUserPK());
+
+        // 💡 4. 서비스로 파일 전달
+        ChatRoomResponseDto chatRoom = chatService.createGroupChatRoom(request, roomImage, principal.getUser().getUserPK());
         return ResponseEntity.ok(ApiResponse.onSuccess(chatRoom));
     }
 
