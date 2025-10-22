@@ -9,5 +9,5 @@ public record PostListResponse(
         String contentSummary, // 게시글 내용 요약
         String authorUsername, // 작성자 이름
         Long likesCount, // 좋아요 수
-        LocalDateTime createdAt // 생성 일시 (최신순 정렬에 사용)
+        LocalDateTime createdDate // 생성 일시 (최신순 정렬에 사용)
 ) {}

@@ -30,4 +30,9 @@ public interface UserRepository extends JpaRepository<UserEntity,Integer> {
     List<UserEntity> findAllByUserIDIn(List<String> userIDs);
 
     Integer userPK(int userPK);
+
+
+
+
+
 }

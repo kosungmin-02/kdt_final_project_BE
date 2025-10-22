@@ -19,7 +19,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class UserEntity extends BaseEntity {
 
     @Id
@@ -33,6 +32,7 @@ public class UserEntity extends BaseEntity {
     @Column(name="USERPASSWORD", nullable=false, length=100)
     private String userPassword;
 
+    // 쿼리에서 사용할 수 있도록 getter 메소드 명시적으로 정의
     @Column(name = "USERNAME", nullable=false, length = 20)
     private String userName;
 

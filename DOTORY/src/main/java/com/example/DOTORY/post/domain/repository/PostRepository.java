@@ -16,51 +16,50 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAllByUser_UserPKOrderByCreatedDateDesc(int userPK);
 
-    // 특정 유저가 작성한 게시글 조회 (UserEntity의 USERPK 사용)
     Page<Post> findByUser_UserPK(int userPK, Pageable pageable);
 
-    // 1. 최신순 정렬
+    // 최신순 정렬
     @Query("""
         SELECT new com.example.DOTORY.post.api.dto.response.PostListResponse(
             p.postId,
             p.thumbnailUrl,
             p.caption,
             p.user.userName,
-            COUNT(DISTINCT l.likeId),
+            COALESCE(COUNT(DISTINCT l.likeId), 0L),
             p.createdDate
         )
         FROM Post p
+        LEFT JOIN p.decoration d
         LEFT JOIN p.likes l
-        WHERE p.caption LIKE CONCAT('%', :keyword, '%')
-        GROUP BY
-            p.postId,
-            p.thumbnailUrl,
-            p.caption,
-            p.user.userName,
-            p.createdDate
+        WHERE (
+            (d IS NOT NULL AND d.keywords IS NOT NULL AND LOWER(d.keywords) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+            (p.caption IS NOT NULL AND LOWER(p.caption) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+            (p.user.userName IS NOT NULL AND LOWER(p.user.userName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        )
+        GROUP BY p.postId, p.thumbnailUrl, p.caption, p.user.userName, p.createdDate
         ORDER BY p.createdDate DESC
     """)
     List<PostListResponse> findByHashtagKeywordOrderByLatest(@Param("keyword") String keyword);
 
-    // 2. 좋아요순 정렬
+    // 인기순 정렬
     @Query("""
         SELECT new com.example.DOTORY.post.api.dto.response.PostListResponse(
             p.postId,
             p.thumbnailUrl,
             p.caption,
             p.user.userName,
-            COUNT(DISTINCT l.likeId),
+            COALESCE(COUNT(DISTINCT l.likeId), 0L),
             p.createdDate
         )
         FROM Post p
+        LEFT JOIN p.decoration d
         LEFT JOIN p.likes l
-        WHERE p.caption LIKE CONCAT('%', :keyword, '%')
-        GROUP BY
-            p.postId,
-            p.thumbnailUrl,
-            p.caption,
-            p.user.userName,
-            p.createdDate
+        WHERE (
+            (d IS NOT NULL AND d.keywords IS NOT NULL AND LOWER(d.keywords) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+            (p.caption IS NOT NULL AND LOWER(p.caption) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+            (p.user.userName IS NOT NULL AND LOWER(p.user.userName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+        )
+        GROUP BY p.postId, p.thumbnailUrl, p.caption, p.user.userName, p.createdDate
         ORDER BY COUNT(DISTINCT l.likeId) DESC, p.createdDate DESC
     """)
     List<PostListResponse> findByHashtagKeywordOrderByPopular(@Param("keyword") String keyword);
