@@ -47,15 +47,16 @@ public class UserSecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-                        .requestMatchers("/api/users/**",
+                        .requestMatchers(
+                                "/api/users/**",
                                 "/oauth2/**",
-                                "/api/posts/*/comments",
+                                "/api/posts/**/comments",
                                 "/api/admin/**",
-                                "/api/posts/*/likes/count",
+                                "/api/posts/**/likes/count",
                                 "/uploads/**",
-                                "/api/chat**",
+                                "/api/chat/**",
                                 "/api/posts/search"
-                                ).permitAll()
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
