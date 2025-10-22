@@ -1,21 +1,43 @@
 package com.example.DOTORY.notification.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.DOTORY.user.domain.entity.UserEntity;
+import jakarta.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+
+@Entity
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class    Notification {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
+public class Notification {
 
-    private String id;
-    private String message;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    private String title;
+    private String body;
+    private String type; // e.g., "LIKE", "COMMENT"
     private String relatedUrl;
-    private boolean isRead;
-    private long createdAt;
+
+    @Builder.Default
+    private Boolean isRead = false;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    public void markAsRead() {
+        this.isRead = true;
+    }
 }
+
