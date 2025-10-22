@@ -50,9 +50,9 @@ public class UserSecurityConfig {
                         .requestMatchers(
                                 "/api/users/**",
                                 "/oauth2/**",
-                                "/api/posts/**/comments",
+                                "/api/posts/*/comments",
                                 "/api/admin/**",
-                                "/api/posts/**/likes/count",
+                                "/api/posts/*/likes/count",
                                 "/uploads/**",
                                 "/api/chat/**",
                                 "/api/posts/search"
