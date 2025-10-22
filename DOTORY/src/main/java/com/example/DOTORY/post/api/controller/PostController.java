@@ -4,9 +4,12 @@ import com.example.DOTORY.global.code.dto.ApiResponse;
 import com.example.DOTORY.global.security.CustomUserPrincipal;
 import com.example.DOTORY.global.util.MultipartInputStreamFileResource;
 import com.example.DOTORY.post.api.dto.request.PostRequest;
+import com.example.DOTORY.post.api.dto.request.PostSearchRequest;
 import com.example.DOTORY.post.api.dto.response.FeedResponse;
 import com.example.DOTORY.post.api.dto.response.PostDetailResponse;
+import com.example.DOTORY.post.api.dto.response.PostListResponse;
 import com.example.DOTORY.post.api.dto.response.PostResponse;
+import com.example.DOTORY.post.application.PostSearchService;
 import com.example.DOTORY.post.application.PostService;
 import com.example.DOTORY.user.domain.entity.UserEntity;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -33,6 +37,7 @@ import java.util.Map;
 public class PostController {
 
     private final PostService postService;
+    private final PostSearchService postSearchService;
 
     /** 게시글 업로드 (텍스트만, 테스트용) */
     @Operation(summary = "게시글 작성 기능", description = "회원은 게시글을 작성할 수 있음. 텍스트만을 작성할 수 있음.")
@@ -152,5 +157,24 @@ public class PostController {
 
         }
     }
+
+    @Operation(summary = "해시태그 키워드로 게시글 목록 검색", description = "키워드와 정렬 기준(LATEST/POPULAR)에 따라 게시글목록을 조회합니다.")
+    @GetMapping("/search") // GET /api/posts/search?keyword=키워드&sort=정렬기준
+    public ResponseEntity<ApiResponse<List<PostListResponse>>> searchPosts(
+            @ModelAttribute PostSearchRequest request
+    ) {
+        // 요청 유효성 검사는 DTO의 @NotBlank 등으로 처리
+        List<PostListResponse> posts = postSearchService.searchPostsByKeyword(request);
+
+        // 공통 응답 구조 사용 (ErrorStatus를 이용한 예외 처리 포함)
+        return ResponseEntity.ok(ApiResponse.onSuccess(posts));
+    }
+
+
+
+
+
+
+
 
 }

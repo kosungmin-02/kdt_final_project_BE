@@ -35,4 +35,17 @@ public class BookmarkController {
         Long count = bookmarkService.countBookmarks(postId);
         return ResponseEntity.ok(ApiResponse.onSuccess(count));
     }
+
+    // 내가 누른 북마크 조회
+    /** 로그인한 유저가 북마크한 게시글 리스트 조회 */
+    @Operation(summary = "내가 북마크한 게시글 조회", description = "로그인한 유저가 북마크한 게시글 리스트를 조회함")
+    @GetMapping("/bookmarks/mine")
+    public ResponseEntity<ApiResponse<Iterable<Long>>> getMyBookmarks(
+            @AuthenticationPrincipal CustomUserPrincipal principal) {
+
+        int userPK = principal.getUser().getUserPK();
+        Iterable<Long> postIds = bookmarkService.getBookmarksByUser(userPK);
+        return ResponseEntity.ok(ApiResponse.onSuccess(postIds));
+    }
+
 }
