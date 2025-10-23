@@ -168,6 +168,49 @@ public class UserService {
 
         userRepository.save(userEntity);
     }
+    /**
+     * 프로필 배경 이미지 파일 저장 메서드
+     * @param file 업로드할 파일
+     * @param userID 파일명 식별자로 사용할 사용자 ID
+     * @return 프론트에서 접근 가능한 URL
+     */
+    public String saveDecorationFile(MultipartFile file, String userID) {
+        if (file == null || file.isEmpty()) {
+            throw new GeneralException(ErrorStatus.FILE_NOT_FOUND, "업로드할 파일이 없습니다.");
+        }
 
+        // decorations 폴더 아래에 저장
+        String filename = userID + "_bg_" + System.currentTimeMillis() + ".png";
+        Path path = Paths.get("decorations/" + filename); // 경로 변경
 
+        try {
+            Files.createDirectories(path.getParent());
+            file.transferTo(path);
+            return "/decorations/" + filename; // 프론트에서 접근 가능한 URL
+        } catch (IOException e) {
+            log.error("배경 이미지 저장 실패", e);
+            throw new GeneralException(ErrorStatus.FILE_UPLOAD_FAIL, "배경 이미지 저장 실패");
+        }
+    }
+
+    /**
+     * 기존 프로필 배경 이미지 파일을 삭제하는 메서드
+     * @param decorationPath 삭제할 파일의 URL 경로
+     */
+    public void deleteDecorationFile(String decorationPath) {
+        if (decorationPath == null || decorationPath.isBlank()) return;
+
+        try {
+            // URL에서 실제 파일 시스템 경로로 변환 (예: /decorations/... -> decorations/...)
+            String relativePath = decorationPath.startsWith("/") ? decorationPath.substring(1) : decorationPath;
+            Path path = Paths.get(relativePath);
+
+            if (Files.exists(path)) {
+                Files.delete(path);
+                log.info("기존 배경 이미지 삭제 성공: {}", decorationPath);
+            }
+        } catch (Exception e) {
+            log.warn("기존 배경 이미지 삭제 실패: " + decorationPath, e);
+        }
+    }
 }
