@@ -46,8 +46,6 @@ public class BookmarkController {
         int userPK = principal.getUser().getUserPK();
         Iterable<Long> postIds = bookmarkService.getBookmarksByUser(userPK);
         return ResponseEntity.ok(ApiResponse.onSuccess(postIds));
-
-        // 안녕
     }
 
 }

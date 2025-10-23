@@ -9,15 +9,16 @@ import lombok.Getter;
 public class CommentResponse {
 
     private Long commentId;
+    private Long parentId;
     private String content;
-    private int userPK;
+    private String author;
     private boolean isDeleted;
 
     public static CommentResponse from(Comment comment) {
         return CommentResponse.builder()
                 .commentId(comment.getCommentId())
                 .content(comment.isIsdeleted() ? "삭제된 댓글입니다." : comment.getContent())
-                .userPK(comment.getUser().getUserPK())
+                .author(comment.getUser().getUserID())
                 .isDeleted(comment.isIsdeleted())
                 .build();
     }

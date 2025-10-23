@@ -7,16 +7,27 @@ import com.example.DOTORY.post.api.dto.response.CommentResponse;
 import com.example.DOTORY.post.application.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
+
+
+    // CommentController.java 내부에 추가
+    @GetMapping("/test/{postId}")
+    @Operation(summary = "테스트용 엔드포인트", description = "404 문제 진단을 위한 단순 테스트")
+    public ResponseEntity<ApiResponse<String>> testMapping(@PathVariable Long postId) {
+        log.info("Test Mapping Called with postId: {}", postId);
+        return ResponseEntity.ok(ApiResponse.onSuccess("Mapping Success for: " + postId));
+    }
 
     /** 댓글 작성 (로그인 필요) */
     @Operation(summary = "댓글 작성(추가)", description = "로그인한 사용자인 경우 댓글을 추가할 수 있음. (대댓글 포함 기능)")
@@ -26,6 +37,7 @@ public class CommentController {
             @RequestBody CommentRequest request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
 
+        log.info("CommentController 호출");
         int userPK = principal.getUser().getUserPK();
         CommentResponse response = commentService.addComment(postId, request, userPK);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));

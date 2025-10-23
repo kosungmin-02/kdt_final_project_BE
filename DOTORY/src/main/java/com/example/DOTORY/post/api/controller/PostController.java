@@ -200,6 +200,7 @@ public class PostController {
         // 요청 유효성 검사는 DTO의 @NotBlank 등으로 처리
         List<PostListResponse> posts = postSearchService.searchPostsByKeyword(request);
 
+        log.info("PostControllr - searchPosts");
         // 공통 응답 구조 사용 (ErrorStatus를 이용한 예외 처리 포함)
         return ResponseEntity.ok(ApiResponse.onSuccess(posts));
     }
