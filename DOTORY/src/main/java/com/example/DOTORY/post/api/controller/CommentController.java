@@ -26,6 +26,11 @@ public class CommentController {
             @RequestBody CommentRequest request,
             @AuthenticationPrincipal CustomUserPrincipal principal) {
 
+        // 디버깅용 로그
+        System.out.println("PostId: " + postId);
+        System.out.println("Request Content: " + request.getContent());
+        System.out.println("User: " + principal.getUser().getUserPK());
+
         int userPK = principal.getUser().getUserPK();
         CommentResponse response = commentService.addComment(postId, request, userPK);
         return ResponseEntity.ok(ApiResponse.onSuccess(response));

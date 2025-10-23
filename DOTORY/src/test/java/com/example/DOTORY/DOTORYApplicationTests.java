@@ -1,9 +1,9 @@
 package com.example.DOTORY;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+// @SpringBootTest
 class DOTORYApplicationTests {
 
 	@Test

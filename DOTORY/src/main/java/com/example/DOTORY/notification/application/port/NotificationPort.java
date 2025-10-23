@@ -4,6 +4,6 @@ import com.example.DOTORY.notification.domain.Notification;
 import java.util.List;
 
 public interface NotificationPort {
-    List<Notification> findAllByUserId(String userId);
-    void save(Notification notification, String userId);
+    List<Notification> findAllByUser_UserPK(Integer userPK);
+    Notification save(Notification notification);
 }
