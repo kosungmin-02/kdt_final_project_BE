@@ -2,8 +2,7 @@ package com.example.DOTORY.post.application;
 
 import com.example.DOTORY.global.code.status.ErrorStatus;
 import com.example.DOTORY.global.exception.GeneralException;
-import com.example.DOTORY.notification.application.port.NotificationPort;
-import com.example.DOTORY.notification.domain.Notification;
+import com.example.DOTORY.notification.application.NotificationService;
 import com.example.DOTORY.post.api.dto.request.CommentRequest;
 import com.example.DOTORY.post.api.dto.response.CommentResponse;
 import com.example.DOTORY.post.domain.entity.Comment;
@@ -28,7 +27,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final NotificationPort notificationPort;
+    private final NotificationService notificationService;
 
     public CommentResponse addComment(Long postId, CommentRequest request, int userPK) {
         Post post = postRepository.findById(postId)
@@ -54,15 +53,13 @@ public class CommentService {
         Comment savedComment = commentRepository.save(comment);
 
         UserEntity postAuthor = post.getUser();
+        // Send notification if the commenter is not the post author
         if (postAuthor.getUserPK() != user.getUserPK()) {
-            String message = user.getUserNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
-            Notification notification = Notification.builder()
-                    .message(message)
-                    .relatedUrl("/posts/" + post.getPostId())
-                    .isRead(false)
-                    .createdAt(System.currentTimeMillis())
-                    .build();
-            notificationPort.save(notification, String.valueOf(postAuthor.getUserPK()));
+            String title = "새로운 댓글";
+            String body = user.getUserNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
+            String type = "COMMENT";
+            String relatedUrl = "/posts/" + post.getPostId();
+            notificationService.sendNotification(postAuthor, title, body, type, relatedUrl);
         }
 
         return CommentResponse.from(savedComment);
