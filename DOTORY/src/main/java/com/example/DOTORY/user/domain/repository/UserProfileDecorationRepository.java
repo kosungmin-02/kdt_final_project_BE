@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserProfileDecorationRepository extends JpaRepository<ProfileDecorationEntity, Long> {
-    Optional<ProfileDecorationEntity> findByUser_userPK(Long userPK);
+    Optional<ProfileDecorationEntity> findByUser_userPK(int userPK);
 }

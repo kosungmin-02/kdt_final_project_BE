@@ -30,19 +30,19 @@ public class ProfileDecorationService {
     /**
      * 이미지 파일을 업로드하고 접근 가능한 URL을 반환합니다. (배경/스티커 공용)
      */
-    public String uploadDecorationImage(String userId, MultipartFile file) {
-        return userService.saveDecorationFile(file, userId);
+    public String uploadDecorationImage(String userID, MultipartFile file) {
+        return userService.saveDecorationFile(file, userID);
     }
 
     /**
      * 프로필 꾸미기 설정을 저장하거나 업데이트합니다.
      */
-    public ProfileDecorationResponseDTO saveOrUpdateDecoration(Long userId, ProfileDecorationRequestDTO requestDTO) {
-        // 1. userRepository.findById()에 Long 타입 PK를 직접 전달하도록 수정
-        UserEntity user = userRepository.findById(Math.toIntExact(userId)) // TODO: findById랑 타입이 안 맞아서 강제 형변환. 숫자 유의
+    public ProfileDecorationResponseDTO saveOrUpdateDecoration(int userPK, ProfileDecorationRequestDTO requestDTO) {
+        // 1. userRepository.findById()에 int 타입 PK를 직접 전달하도록 수정
+        UserEntity user = userRepository.findById(Math.toIntExact(userPK)) // TODO: findById랑 타입이 안 맞아서 강제 형변환. 숫자 유의
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        ProfileDecorationEntity decoration = decorationRepository.findByUser_userPK(userId)
+        ProfileDecorationEntity decoration = decorationRepository.findByUser_userPK(userPK)
                 .orElseGet(() -> ProfileDecorationEntity.builder()
                         .user(user)
                         .backgroundImageUrl(requestDTO.backgroundImageUrl())
@@ -80,8 +80,8 @@ public class ProfileDecorationService {
     /**
      * 프로필 꾸미기 설정을 초기화하고 관련 파일을 삭제합니다.
      */
-    public void deleteDecoration(Long userId) {
-        ProfileDecorationEntity decoration = decorationRepository.findByUser_userPK(userId)
+    public void deleteDecoration(int userPK) {
+        ProfileDecorationEntity decoration = decorationRepository.findByUser_userPK(userPK)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DATABASE_ERROR));
 
         // 1. 배경 이미지 파일 삭제 (getBackgroundImageUrl()로 수정)
@@ -100,7 +100,7 @@ public class ProfileDecorationService {
 
     // 프로필 조회하기
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public ProfileDecorationResponseDTO getDecoration(Long userPK) {
+    public ProfileDecorationResponseDTO getDecoration(int userPK) {
         ProfileDecorationEntity decoration = decorationRepository.findByUser_userPK(userPK)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DECORATION_NOT_FOUND));
 

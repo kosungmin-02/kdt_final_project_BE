@@ -43,11 +43,11 @@ public class ProfileDecorationController {
     }
 
 
-    // UserPK(Long)가 필요한 경우를 위해 ID로 엔티티 조회
-    private Long getCurrentUserPK(String userId) {
-        UserEntity user = userRepository.findByUserID(userId)
+    // UserPK(int)가 필요한 경우를 위해 ID로 엔티티 조회
+    private int getCurrentUserPK(String userID) {
+        UserEntity user = userRepository.findByUserID(userID)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        return (long) user.getUserPK();
+        return user.getUserPK();
     }
 
 
@@ -62,9 +62,11 @@ public class ProfileDecorationController {
             @RequestPart("file") MultipartFile file,
             @RequestHeader("Authorization") String authHeader
     ) {
-        String userId = getCurrentUserID(authHeader);
+        
+        log.info("ProfileDecorationController에서 uploadImage 호출");
+        String userID = getCurrentUserID(authHeader);
 
-        String imageUrl = decorationService.uploadDecorationImage(userId, file); // String userId 전달
+        String imageUrl = decorationService.uploadDecorationImage(userID, file); // String userId 전달
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.onSuccess(imageUrl));
@@ -77,8 +79,8 @@ public class ProfileDecorationController {
             @RequestBody ProfileDecorationRequestDTO requestDTO,
             @RequestHeader("Authorization") String authHeader
     ) {
-        String userId = getCurrentUserID(authHeader);
-        Long userPK = getCurrentUserPK(userId); // UserPK(Long)가 Service에 필요하다면
+        String userID = getCurrentUserID(authHeader);
+        int userPK = getCurrentUserPK(userID); // UserPK(Long)가 Service에 필요하다면
 
         ProfileDecorationResponseDTO responseDTO = decorationService.saveOrUpdateDecoration(userPK, requestDTO);
         return ResponseEntity.ok()
@@ -90,7 +92,7 @@ public class ProfileDecorationController {
     @Operation(summary = "프로필 꾸미기 설정 조회", description = "특정 사용자의 현재 꾸미기 설정을 조회합니다.")
     @GetMapping("/{userPK}") // <--- 바로 이 메서드입니다.
     public ResponseEntity<ApiResponse<ProfileDecorationResponseDTO>> getDecoration(
-            @Parameter(description = "조회 대상 사용자 ID", required = true) @PathVariable Long userPK) {
+            @Parameter(description = "조회 대상 사용자 ID", required = true) @PathVariable int userPK) {
         ProfileDecorationResponseDTO responseDTO = decorationService.getDecoration(userPK);
         return ResponseEntity.ok()
                 .body(ApiResponse.onSuccess(responseDTO));
@@ -104,8 +106,8 @@ public class ProfileDecorationController {
     public ResponseEntity<ApiResponse<Void>> deleteDecoration(
             @RequestHeader("Authorization") String authHeader
     ) {
-        String userId = getCurrentUserID(authHeader);
-        Long userPK = getCurrentUserPK(userId);
+        String userID = getCurrentUserID(authHeader);
+        int userPK = getCurrentUserPK(userID);
 
         decorationService.deleteDecoration(userPK);
         return ResponseEntity.ok()
