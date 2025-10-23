@@ -121,6 +121,7 @@ public class PostController {
     }
 
     // 중간 프록시 역할을 위한 FastAPI 호출
+    // 키워드 뽑아내기 용도의 FAST API
     @Operation(summary = "FastAPI 호출", description = "기존에 프론트에 연결되어있던 FastAPI를 보안 문제 등으로 인하여 백단이 중간 프록시 역할을 하도록 백단에 연결하였습니다.")
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeImage(
@@ -158,6 +159,39 @@ public class PostController {
         }
     }
 
+    // 상품링크 뽑아내기 위한 용도의 FAST API
+    /** 제품 이미지 분석 */
+    @PostMapping(value = "/analyze/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<Map<String, Object>>> analyzeProductImage(
+            @RequestPart("file") MultipartFile file
+    ) {
+        try {
+            String fastApiUrl = "http://43.202.35.139:8000/api/analyze/products";
+            log.info("FastAPI 제품 분석 호출: 파일명 = {}", file.getOriginalFilename());
+
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new MultipartInputStreamFileResource(file.getInputStream(), file.getOriginalFilename()));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<Map> response = restTemplate.postForEntity(fastApiUrl, requestEntity, Map.class);
+
+            log.info("FastAPI 호출 완료, 상태 코드: {}", response.getStatusCode());
+            log.info("FastAPI 응답: {}", response.getBody());
+
+            return ResponseEntity.ok(ApiResponse.onSuccess(response.getBody()));
+
+        } catch (Exception e) {
+            log.error("FastAPI 호출 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.onFailure("FASTAPI_ERROR", "FastAPI 제품 분석 호출 실패", null));
+        }
+    }
+
     @Operation(summary = "해시태그 키워드로 게시글 목록 검색", description = "키워드와 정렬 기준(LATEST/POPULAR)에 따라 게시글목록을 조회합니다.")
     @GetMapping("/search") // GET /api/posts/search?keyword=키워드&sort=정렬기준
     public ResponseEntity<ApiResponse<List<PostListResponse>>> searchPosts(
@@ -166,6 +200,7 @@ public class PostController {
         // 요청 유효성 검사는 DTO의 @NotBlank 등으로 처리
         List<PostListResponse> posts = postSearchService.searchPostsByKeyword(request);
 
+        log.info("PostControllr - searchPosts");
         // 공통 응답 구조 사용 (ErrorStatus를 이용한 예외 처리 포함)
         return ResponseEntity.ok(ApiResponse.onSuccess(posts));
     }

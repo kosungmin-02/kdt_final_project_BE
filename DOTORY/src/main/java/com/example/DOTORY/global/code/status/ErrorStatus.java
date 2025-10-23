@@ -38,6 +38,7 @@ public enum ErrorStatus implements BaseErrorCode {
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST4045", "게시글을 찾을 수 없습니다."),
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "COMMENT4047", "댓글을 찾을 수 없습니다."),
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "FILE4049", "파일을 찾을 수 없습니다."),
+    DECORATION_NOT_FOUND(HttpStatus.NOT_FOUND, "DECORATION4041", "프로필 꾸미기 설정을 찾을 수 없습니다."),
 
 
     // 405 Method Not Allowed
