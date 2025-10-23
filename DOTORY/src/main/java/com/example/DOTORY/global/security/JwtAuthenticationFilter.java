@@ -7,13 +7,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
@@ -30,18 +31,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
-        if (token != null && jwtProvider.validateToken(token)) {
-            String userId = jwtProvider.getUserIdFromToken(token);
+        log.debug("Extracted Token: {}", token);
+        if (token != null) {
+            if (jwtProvider.validateToken(token)) {
+                String userId = jwtProvider.getUserIdFromToken(token);
+                log.debug("Token is valid. User ID: {}", userId);
 
-            // DB에서 UserEntity 조회
-            UserEntity user = userRepository.findByUserID(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                UserEntity user = userRepository.findByUserID(userId)
+                        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-            // CustomUserPrincipal 생성
-            CustomUserPrincipal principal = new CustomUserPrincipal(user);
-            UsernamePasswordAuthenticationToken auth =
-                    new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                CustomUserPrincipal principal = new CustomUserPrincipal(user);
+                UsernamePasswordAuthenticationToken auth =
+                        new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(auth);
+            } else {
+                log.warn("Invalid or expired token: {}", token);
+            }
         }
         filterChain.doFilter(request, response);
     }
