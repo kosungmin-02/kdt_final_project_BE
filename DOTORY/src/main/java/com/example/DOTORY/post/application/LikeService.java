@@ -48,10 +48,12 @@ public class LikeService {
             // Send notification if the liker is not the post author
             if (postAuthor.getUserPK() != liker.getUserPK()) {
                 String title = "새로운 좋아요";
-                String body = liker.getUserNickname() + "님이 회원님의 게시글을 좋아합니다.";
+                String caption = post.getCaption();
+                String postIdentifier = (caption != null && caption.length() > 10) ? caption.substring(0, 10) + "..." : caption;
+                String body = liker.getUserNickname() + "님이 회원님의 '" + postIdentifier + "' 게시글을 좋아합니다.";
                 String type = "LIKE";
                 String relatedUrl = "/posts/" + post.getPostId();
-                notificationService.sendNotification(postAuthor, title, body, type, relatedUrl);
+                notificationService.sendNotification(postAuthor, liker, title, body, type, relatedUrl);
             }
 
             return "좋아요 추가";

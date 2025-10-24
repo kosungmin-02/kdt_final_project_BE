@@ -24,6 +24,10 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "actor_id")
+    private UserEntity actor;
+
     private String title;
     private String body;
     private String type; // e.g., "LIKE", "COMMENT"

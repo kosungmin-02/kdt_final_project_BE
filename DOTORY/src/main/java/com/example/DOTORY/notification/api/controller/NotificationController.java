@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
- @Tag(name = "Notifications", description = "알림 관련 API")
- @RestController @RequestMapping("/api/notifications")
- @RequiredArgsConstructor
+@Tag(name = "Notifications", description = "알림 관련 API")
+@RestController @RequestMapping("/api/notifications")
+@RequiredArgsConstructor
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -31,11 +31,10 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.onSuccess("FCM token registered successfully."));
     }
 
-    @Operation(summary = "내 알림 목록 조회")
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<NotificationResponse>>> getMyNotifications(@AuthenticationPrincipal CustomUserPrincipal principal) {
-        String currentUserId = String.valueOf(principal.getUser().getUserPK());
-        List<NotificationResponse> notifications = notificationService.findMyNotifications(currentUserId);
+    @Operation(summary = "특정 사용자의 알림 목록 조회")
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<List<NotificationResponse>>> getMyNotifications(@PathVariable String userId) {
+        List<NotificationResponse> notifications = notificationService.findMyNotifications(userId);
         return ResponseEntity.ok(ApiResponse.onSuccess(notifications));
     }
 }
