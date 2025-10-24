@@ -22,8 +22,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
- @Service @RequiredArgsConstructor
- @Slf4j
+@Service @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationPort notificationPort;
@@ -31,10 +31,10 @@ public class NotificationService {
 
 
     public List<NotificationResponse> findMyNotifications(String userId) {
-        UserEntity user = userRepository.findByUserID(userId)
+        UserEntity user = userRepository.findByUserPK(Integer.valueOf(userId))
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
         List<Notification> notifications = notificationPort.findAllByUser_UserPK(user.getUserPK());
-        
+
         return notifications.stream()
                 .map(NotificationResponse::fromDomain)
                 .collect(Collectors.toList());
@@ -49,7 +49,7 @@ public class NotificationService {
     }
 
     @Transactional
-    public void sendNotification(UserEntity recipient, String title, String body, String type, String relatedUrl) {
+    public void sendNotification(UserEntity recipient, UserEntity actor, String title, String body, String type, String relatedUrl) {
         if (recipient.getFcmToken() != null && !recipient.getFcmToken().isEmpty()) {
             try {
                 String accessToken = getAccessToken();
@@ -103,6 +103,7 @@ public class NotificationService {
         // Save notification to database
         Notification notification = Notification.builder()
                 .user(recipient)
+                .actor(actor)
                 .title(title)
                 .body(body)
                 .type(type)

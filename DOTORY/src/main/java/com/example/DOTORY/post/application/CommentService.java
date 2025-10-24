@@ -56,10 +56,12 @@ public class CommentService {
         // Send notification if the commenter is not the post author
         if (postAuthor.getUserPK() != user.getUserPK()) {
             String title = "새로운 댓글";
-            String body = user.getUserNickname() + "님이 회원님의 게시글에 댓글을 남겼습니다.";
+            String caption = post.getCaption();
+            String postIdentifier = (caption != null && caption.length() > 10) ? caption.substring(0, 10) + "..." : caption;
+            String body = user.getUserNickname() + "님이 회원님의 '" + postIdentifier + "' 게시글에 댓글을 남겼습니다.";
             String type = "COMMENT";
             String relatedUrl = "/posts/" + post.getPostId();
-            notificationService.sendNotification(postAuthor, title, body, type, relatedUrl);
+            notificationService.sendNotification(postAuthor, user, title, body, type, relatedUrl);
         }
 
         return CommentResponse.from(savedComment);
