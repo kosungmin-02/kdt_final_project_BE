@@ -31,8 +31,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             // JWT 발급
             String token = jwtProvider.generateToken(user.getUserID());
 
-            // 리액트 테스트용 - 임시 프론트 만들어서 테스트 해봤습니다.
-            String redirectUrl = "http://localhost:3000/oauth/callback?token=" + token;
+            // 토큰 가져오기
+            String redirectUrl = "http://localhost:5173/oauth2/redirect?token=" + token;
             response.sendRedirect(redirectUrl);
         } else {
             response.sendRedirect("http://localhost:3000/register");
