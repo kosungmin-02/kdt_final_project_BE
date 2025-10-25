@@ -1,5 +1,7 @@
 package com.example.DOTORY.admin.api.controller;
 
+import com.example.DOTORY.admin.api.dto.AdminCheckUserDTO;
+import com.example.DOTORY.admin.api.dto.AdminMessageDTO;
 import com.example.DOTORY.admin.api.dto.AdminMessageRequestDTO;
 import com.example.DOTORY.admin.api.dto.AdminMessageResultDTO;
 import com.example.DOTORY.admin.application.AdminMessageService;
@@ -56,18 +58,47 @@ public class AdminMessageController {
     // 2-2. 전체 메시지 조회
     @Operation(summary = "전체 메시지 조회", description = "모든 메시지를 조회합니다.")
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<AdminMessageEntity>>> getAllMessages() {
-        List<AdminMessageEntity> messages = adminMessageService.getAllMessages();
-        return ResponseEntity.ok(ApiResponse.onSuccess(messages));
+    public ResponseEntity<ApiResponse<List<AdminMessageDTO>>> getAllMessages() {
+        List<AdminMessageDTO> dtos = adminMessageService.getAllMessages().stream()
+                .map(msg -> new AdminMessageDTO(
+                        msg.getAdminMessageID(),
+                        msg.getUser() != null ? msg.getUser().getUserID() : null,
+                        msg.getMessageTitle(),
+                        msg.getMessageContent(),
+                        msg.getMessageType() != null ? msg.getMessageType().name() : null,
+                        msg.isIssent(),
+                        msg.getCreatedDate() != null ? msg.getCreatedDate().toString() : null
+                ))
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(dtos));
     }
+
 
 
 
     // 4. 사용자 ID 자동완성 (입력 시 유저 목록 조회)
     @Operation(summary = "사용자 검색", description = "입력한 키워드에 해당하는 사용자 목록을 조회합니다.")
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<UserEntity>>> searchUsers(@RequestParam String keyword) {
-        List<UserEntity> users = userRepository.findByUserIDContainingIgnoreCase(keyword);
-        return ResponseEntity.ok(ApiResponse.onSuccess(users));
+    public ResponseEntity<ApiResponse<List<AdminCheckUserDTO>>> searchUsers(@RequestParam String keyword) {
+        List<AdminCheckUserDTO> dtos = userRepository.findByUserIDContainingIgnoreCase(keyword)
+                .stream()
+                .map(user -> new AdminCheckUserDTO(
+                        user.getUserPK(),
+                        user.getUserID(),
+                        user.getUserName(),
+                        user.getUserNickname(),
+                        user.getUserEmail(),
+                        user.getCreatedDate(),
+                        user.getUpdatedDate(),
+                        user.getUserStatus(),
+                        List.of(), // snsProviders
+                        List.of(), // agreements
+                        List.of()  // reports
+                ))
+                .toList();
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(dtos));
     }
+
 }

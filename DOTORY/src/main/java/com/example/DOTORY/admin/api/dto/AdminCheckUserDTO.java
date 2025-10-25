@@ -7,6 +7,7 @@ import java.util.List;
 
 public record AdminCheckUserDTO(
         int userPK,
+        String userID,            // ✅ 추가
         String userName,
         String userNickname,
         String userEmail,
@@ -16,6 +17,4 @@ public record AdminCheckUserDTO(
         List<String> snsProviders,
         List<UserAgreeInfoDTO> agreements,
         List<AdminCheckUserReportDTO> reports
-) {
-
-}
+) { }
