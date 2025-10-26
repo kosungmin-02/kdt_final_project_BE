@@ -82,6 +82,7 @@ public class AdminUserService {
 
         return new AdminCheckUserDTO(
                 user.getUserPK(),
+                user.getUserID(),
                 user.getUserName(),
                 user.getUserNickname(),
                 user.getUserEmail(),
